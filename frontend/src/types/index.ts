@@ -134,4 +134,26 @@ export type FeatureCategory =
   | 'quiz_generator'
   | 'slide_script'
   | 'complaint_response'
-  | 'custom';
+  | 'custom'
+  | 'prompt_grader'
+  | 'prompt_compare'
+  | 'schema_enforcer'
+  | 'self_correcting'
+  | 'quality_pipeline'
+  | 'decomposition'
+  | 'injection_tester'
+  | 'fewshot_builder'
+  | 'expert_panel'
+  | 'document_qa'
+  | 'compliance_checker'
+  | 'tone_transformer'
+  | 'misconception_detector'
+  | 'cot_visualizer'
+  | 'rag_simulator'
+  | 'scenario_simulator'
+  | 'localizer';
+
+export interface CompareResult extends ExecutionResult {
+  output_a?: string;
+  output_b?: string;
+}

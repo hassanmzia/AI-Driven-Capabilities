@@ -20,6 +20,35 @@ const featureItems: NavItem[] = [
   { key: 'custom', label: 'Custom Prompt', icon: '⚡' },
 ];
 
+const advancedItems: NavItem[] = [
+  { key: 'grader', label: 'Prompt Grader', icon: '🎯' },
+  { key: 'abtester', label: 'A/B Tester', icon: '⚖️' },
+  { key: 'schema', label: 'Schema Enforcer', icon: '📐' },
+  { key: 'selfcorrect', label: 'Self-Correcting', icon: '🔄' },
+  { key: 'qualitygate', label: 'Quality Gates', icon: '🛡️' },
+  { key: 'decompose', label: 'Decomposition', icon: '🧩' },
+  { key: 'injection', label: 'Injection Tester', icon: '🔒' },
+  { key: 'fewshot', label: 'Few-Shot Builder', icon: '🎓' },
+];
+
+const knowledgeItems: NavItem[] = [
+  { key: 'expertpanel', label: 'Expert Panel', icon: '👥' },
+  { key: 'documentqa', label: 'Document Q&A', icon: '📄' },
+  { key: 'compliance', label: 'Compliance Checker', icon: '✅' },
+];
+
+const specializedItems: NavItem[] = [
+  { key: 'tone', label: 'Tone Transformer', icon: '🎨' },
+  { key: 'misconception', label: 'Misconception Detector', icon: '🔍' },
+  { key: 'cot', label: 'CoT Visualizer', icon: '🧠' },
+];
+
+const extendedItems: NavItem[] = [
+  { key: 'rag', label: 'RAG Simulator', icon: '📚' },
+  { key: 'scenario', label: 'Scenario Simulator', icon: '🎭' },
+  { key: 'localizer', label: 'Localizer', icon: '🌐' },
+];
+
 const systemItems: NavItem[] = [
   { key: 'templates', label: 'Template Library', icon: '📚' },
   { key: 'agents', label: 'Multi-Agent', icon: '🤖' },
@@ -48,6 +77,58 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate }) => 
         <div className="nav-section">
           <div className="nav-section-title">Prompt Features</div>
           {featureItems.map((item) => (
+            <button
+              key={item.key}
+              className={`nav-item ${currentPage === item.key ? 'active' : ''}`}
+              onClick={() => onNavigate(item.key)}
+            >
+              <span>{item.icon}</span> {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="nav-section">
+          <div className="nav-section-title">Advanced</div>
+          {advancedItems.map((item) => (
+            <button
+              key={item.key}
+              className={`nav-item ${currentPage === item.key ? 'active' : ''}`}
+              onClick={() => onNavigate(item.key)}
+            >
+              <span>{item.icon}</span> {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="nav-section">
+          <div className="nav-section-title">Knowledge</div>
+          {knowledgeItems.map((item) => (
+            <button
+              key={item.key}
+              className={`nav-item ${currentPage === item.key ? 'active' : ''}`}
+              onClick={() => onNavigate(item.key)}
+            >
+              <span>{item.icon}</span> {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="nav-section">
+          <div className="nav-section-title">Specialized</div>
+          {specializedItems.map((item) => (
+            <button
+              key={item.key}
+              className={`nav-item ${currentPage === item.key ? 'active' : ''}`}
+              onClick={() => onNavigate(item.key)}
+            >
+              <span>{item.icon}</span> {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="nav-section">
+          <div className="nav-section-title">Extended</div>
+          {extendedItems.map((item) => (
             <button
               key={item.key}
               className={`nav-item ${currentPage === item.key ? 'active' : ''}`}
