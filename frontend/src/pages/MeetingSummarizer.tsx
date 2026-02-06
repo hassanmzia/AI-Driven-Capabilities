@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FeatureLayout, ModelSelector } from '../components/shared/FeatureLayout';
-import { executeMeetingSummarizer } from '../services/api';
+import { executeMeetingSummarizer, exportMeetingToDocx } from '../services/api';
 import type { ExecutionResult } from '../types';
 
 const EXAMPLE = `John: Good morning, everyone. Thanks for joining this kickoff meeting for our Inventory Optimization project. As you know, we've been facing inventory management challenges at RetailSmart.
@@ -20,6 +20,7 @@ export const MeetingSummarizer: React.FC = () => {
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const handleExecute = async () => {
     if (!transcript.trim()) return;
@@ -34,11 +35,28 @@ export const MeetingSummarizer: React.FC = () => {
     }
   };
 
+  const handleExportDocx = async () => {
+    if (!result?.execution_id) return;
+    setExporting(true);
+    try {
+      await exportMeetingToDocx(result.execution_id);
+    } catch (e: any) {
+      setError(e.response?.data?.error || e.message || 'Export failed');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <FeatureLayout
       title="Meeting Notes Summarizer"
       description="Summarize meeting transcripts into structured notes with objectives, participants, and action items"
       result={result} loading={loading} error={error}
+      extraActions={result && !loading ? (
+        <button className="btn btn-secondary btn-sm" onClick={handleExportDocx} disabled={exporting}>
+          {exporting ? <><span className="loading-spinner" /> Exporting...</> : 'Download Word'}
+        </button>
+      ) : undefined}
     >
       <div className="form-group">
         <label className="form-label">Meeting Transcript</label>

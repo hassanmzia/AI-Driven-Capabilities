@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FeatureLayout, ModelSelector } from '../components/shared/FeatureLayout';
-import { executeQuizGenerator } from '../services/api';
+import { executeQuizGenerator, exportQuizToDocx } from '../services/api';
 import type { ExecutionResult } from '../types';
 
 const EXAMPLE = `Introduction to Generative AI and Language Models (LLMs)
@@ -15,6 +15,7 @@ export const QuizGenerator: React.FC = () => {
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const handleExecute = async () => {
     if (!content.trim()) return;
@@ -29,11 +30,28 @@ export const QuizGenerator: React.FC = () => {
     }
   };
 
+  const handleExportDocx = async () => {
+    if (!result?.execution_id) return;
+    setExporting(true);
+    try {
+      await exportQuizToDocx(result.execution_id);
+    } catch (e: any) {
+      setError(e.response?.data?.error || e.message || 'Export failed');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <FeatureLayout
       title="Training Quiz Generator"
       description="Generate multiple-choice quizzes from educational content with configurable difficulty levels"
       result={result} loading={loading} error={error}
+      extraActions={result && !loading ? (
+        <button className="btn btn-secondary btn-sm" onClick={handleExportDocx} disabled={exporting}>
+          {exporting ? <><span className="loading-spinner" /> Exporting...</> : 'Download Word'}
+        </button>
+      ) : undefined}
     >
       <div className="form-group">
         <label className="form-label">Source Content</label>
