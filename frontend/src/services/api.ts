@@ -41,6 +41,21 @@ export const executeCustomPrompt = (data: {
 }): Promise<ExecutionResult> =>
   api.post('/api/v1/execute/custom/', data).then(r => r.data);
 
+// --- Export APIs ---
+
+export const exportSlidesToPPTX = (executionId: string): Promise<void> =>
+  api.post('/api/v1/export/slides-pptx/', { execution_id: executionId }, { responseType: 'blob' })
+    .then(response => {
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'presentation.pptx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    });
+
 // --- Template APIs ---
 
 export const getTemplates = (params?: Record<string, string>): Promise<{ results: PromptTemplate[] }> =>

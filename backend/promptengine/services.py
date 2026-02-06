@@ -2,6 +2,8 @@
 Core prompt engineering services - implements all 5 notebook features
 plus custom prompt execution.
 """
+import io
+import re
 import time
 import json
 import logging
@@ -220,3 +222,108 @@ def generate_complaint_response(complaint, company_name='Our Company', agent_nam
 def execute_custom_prompt(system_prompt='', user_prompt='', model='gpt-4o-mini',
                           temperature=0.7, max_tokens=1024):
     return execute_prompt(system_prompt, user_prompt, model, temperature, max_tokens)
+
+
+def _sanitize_slide_json(text):
+    """Clean LLM output to extract valid JSON for slide data."""
+    # Strip markdown code blocks
+    cleaned = re.sub(r'```(?:json)?\s*\n?', '', text).strip()
+    cleaned = cleaned.rstrip('`').strip()
+    # Fix unquoted NULL/TRUE/FALSE
+    cleaned = re.sub(r':\s*NULL\b', ': null', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r':\s*TRUE\b', ': true', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r':\s*FALSE\b', ': false', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r',\s*([}\]])', r'\1', cleaned)  # trailing commas
+    # Find the JSON array
+    start = cleaned.find('[')
+    end = cleaned.rfind(']')
+    if start >= 0 and end > start:
+        cleaned = cleaned[start:end + 1]
+    return cleaned
+
+
+def generate_pptx(slide_json_str):
+    """Convert slide script JSON into a PowerPoint file. Returns BytesIO buffer."""
+    from pptx import Presentation
+    from pptx.util import Inches, Pt, Emu
+    from pptx.dml.color import RGBColor
+    from pptx.enum.text import PP_ALIGN
+
+    # Parse the slide data
+    sanitized = _sanitize_slide_json(slide_json_str)
+    slides_data = json.loads(sanitized)
+    if not isinstance(slides_data, list):
+        slides_data = [slides_data]
+
+    prs = Presentation()
+    # Set 16:9 aspect ratio
+    prs.slide_width = Inches(13.333)
+    prs.slide_height = Inches(7.5)
+
+    for slide_data in slides_data:
+        slide_layout = prs.slide_layouts[6]  # blank layout
+        slide = prs.slides.add_slide(slide_layout)
+
+        # Background fill
+        bg = slide.background
+        fill = bg.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(0x1E, 0x1E, 0x2E)
+
+        # Slide number badge (top-right)
+        slide_num = slide_data.get('slide_number', '')
+        if slide_num:
+            num_box = slide.shapes.add_textbox(Inches(11.5), Inches(0.3), Inches(1.2), Inches(0.5))
+            tf = num_box.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.alignment = PP_ALIGN.CENTER
+            run = p.add_run()
+            run.text = f"#{slide_num}"
+            run.font.size = Pt(14)
+            run.font.color.rgb = RGBColor(0x94, 0x94, 0xF8)
+            run.font.bold = True
+
+        # Title
+        title_text = slide_data.get('title', 'Untitled')
+        title_box = slide.shapes.add_textbox(Inches(0.8), Inches(0.6), Inches(10), Inches(1.2))
+        tf = title_box.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        run = p.add_run()
+        run.text = title_text
+        run.font.size = Pt(32)
+        run.font.bold = True
+        run.font.color.rgb = RGBColor(0xCD, 0xD6, 0xF4)
+
+        # Accent line under title
+        slide.shapes.add_shape(
+            1, Inches(0.8), Inches(1.85), Inches(3), Emu(36000)
+        ).fill.solid()
+        slide.shapes[-1].fill.fore_color.rgb = RGBColor(0x6C, 0x6C, 0xF4)
+
+        # Bullet points
+        bullets = slide_data.get('bullets', [])
+        if bullets:
+            bullet_box = slide.shapes.add_textbox(Inches(0.8), Inches(2.2), Inches(11), Inches(4))
+            tf = bullet_box.text_frame
+            tf.word_wrap = True
+            for i, bullet in enumerate(bullets):
+                p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+                p.space_after = Pt(12)
+                run = p.add_run()
+                run.text = f"\u2022  {bullet}"
+                run.font.size = Pt(18)
+                run.font.color.rgb = RGBColor(0xBA, 0xC2, 0xDE)
+
+        # Speaker notes
+        notes_text = slide_data.get('speaker_notes', '')
+        if notes_text:
+            notes_slide = slide.notes_slide
+            notes_tf = notes_slide.notes_text_frame
+            notes_tf.text = notes_text
+
+    buf = io.BytesIO()
+    prs.save(buf)
+    buf.seek(0)
+    return buf

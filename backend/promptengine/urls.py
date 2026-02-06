@@ -18,5 +18,6 @@ urlpatterns = [
     path('execute/slide-script/', views.slide_script_generator, name='slide-script'),
     path('execute/complaint-response/', views.complaint_response, name='complaint-response'),
     path('execute/custom/', views.custom_prompt, name='custom-prompt'),
+    path('export/slides-pptx/', views.export_slides_pptx, name='export-slides-pptx'),
     path('health/', views.health_check, name='health-check'),
 ]
