@@ -80,7 +80,7 @@ export const ExecutionHistory: React.FC = () => {
                     <td style={{ fontSize: '0.75rem' }}>{exec.model_used}</td>
                     <td><span className={`badge ${exec.status === 'completed' ? 'badge-success' : 'badge-error'}`}>{exec.status}</span></td>
                     <td>{exec.tokens_input + exec.tokens_output}</td>
-                    <td>${(exec.cost_estimate || 0).toFixed(5)}</td>
+                    <td>${Number(exec.cost_estimate || 0).toFixed(5)}</td>
                     <td>{exec.latency_ms}ms</td>
                     <td>
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -114,7 +114,7 @@ export const ExecutionHistory: React.FC = () => {
                 <div className="meta-item">ID: <strong style={{ fontSize: '0.7rem' }}>{selectedExec.id}</strong></div>
                 <div className="meta-item">Model: <strong>{selectedExec.model_used}</strong></div>
                 <div className="meta-item">Tokens: <strong>{selectedExec.tokens_input + selectedExec.tokens_output}</strong></div>
-                <div className="meta-item">Cost: <strong>${(selectedExec.cost_estimate || 0).toFixed(5)}</strong></div>
+                <div className="meta-item">Cost: <strong>${Number(selectedExec.cost_estimate || 0).toFixed(5)}</strong></div>
               </div>
             </div>
           )}
