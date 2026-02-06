@@ -17,6 +17,7 @@ router.all('/*', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         ...(req.headers.authorization && { Authorization: req.headers.authorization }),
+        ...(req.headers['x-session-id'] && { 'X-Session-Id': req.headers['x-session-id'] }),
       },
       timeout: 120000,
       responseType: isExport ? 'arraybuffer' : 'json',
