@@ -72,6 +72,49 @@ const sections: NavSection[] = [
     ],
   },
   {
+    title: 'Reasoning',
+    defaultOpen: false,
+    items: [
+      { key: 'selfconsistency', label: 'Self-Consistency', icon: '🗳️' },
+      { key: 'tot', label: 'Tree of Thoughts', icon: '🌳' },
+      { key: 'reflection', label: 'Reflection Loop', icon: '🪞' },
+    ],
+  },
+  {
+    title: 'Agent Patterns',
+    defaultOpen: false,
+    items: [
+      { key: 'react', label: 'ReAct Agent', icon: '⚡' },
+      { key: 'roledesigner', label: 'Role Designer', icon: '🎭' },
+      { key: 'coordinator', label: 'Coordinator', icon: '🔀' },
+    ],
+  },
+  {
+    title: 'Auto-Optimization',
+    defaultOpen: false,
+    items: [
+      { key: 'ape', label: 'APE Studio', icon: '🤖' },
+      { key: 'evolution', label: 'Prompt Evolution', icon: '🧬' },
+      { key: 'metaprompt', label: 'Meta Prompt', icon: '🔮' },
+    ],
+  },
+  {
+    title: 'Safety',
+    defaultOpen: false,
+    items: [
+      { key: 'guardrails', label: 'Guardrail Builder', icon: '🛡️' },
+      { key: 'selfverify', label: 'Self-Verification', icon: '✔️' },
+    ],
+  },
+  {
+    title: 'Context & Memory',
+    defaultOpen: false,
+    items: [
+      { key: 'contextpack', label: 'Context Packing', icon: '📦' },
+      { key: 'memoryaware', label: 'Memory-Aware', icon: '🧠' },
+    ],
+  },
+  {
     title: 'Learning Hub',
     defaultOpen: false,
     items: [

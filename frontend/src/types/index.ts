@@ -151,7 +151,20 @@ export type FeatureCategory =
   | 'cot_visualizer'
   | 'rag_simulator'
   | 'scenario_simulator'
-  | 'localizer';
+  | 'localizer'
+  | 'self_consistency'
+  | 'tree_of_thoughts'
+  | 'reflection_loop'
+  | 'react_agent'
+  | 'agent_role_designer'
+  | 'coordinator_router'
+  | 'ape_studio'
+  | 'prompt_evolution'
+  | 'meta_prompt'
+  | 'guardrail_builder'
+  | 'self_verification'
+  | 'context_packer'
+  | 'memory_aware';
 
 export interface CompareResult extends ExecutionResult {
   output_a?: string;

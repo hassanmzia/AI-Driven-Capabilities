@@ -195,3 +195,86 @@ class LocalizerRequestSerializer(serializers.Serializer):
     target_language = serializers.CharField()
     cultural_context = serializers.CharField(required=False, default='')
     model = serializers.CharField(default='gpt-4o-mini')
+
+
+# --- Phase 13: Advanced Reasoning Serializers ---
+
+class SelfConsistencyRequestSerializer(serializers.Serializer):
+    question = serializers.CharField()
+    num_paths = serializers.IntegerField(default=5, min_value=2, max_value=10)
+    model = serializers.CharField(default='gpt-4o-mini')
+
+class TreeOfThoughtsRequestSerializer(serializers.Serializer):
+    problem = serializers.CharField()
+    num_branches = serializers.IntegerField(default=3, min_value=2, max_value=5)
+    max_depth = serializers.IntegerField(default=3, min_value=2, max_value=5)
+    model = serializers.CharField(default='gpt-4o-mini')
+
+class ReflectionLoopRequestSerializer(serializers.Serializer):
+    task = serializers.CharField()
+    input_text = serializers.CharField()
+    num_rounds = serializers.IntegerField(default=2, min_value=1, max_value=5)
+    model = serializers.CharField(default='gpt-4o-mini')
+
+# --- Phase 14: Agent Pattern Serializers ---
+
+class ReActAgentRequestSerializer(serializers.Serializer):
+    task = serializers.CharField()
+    available_tools = serializers.ListField(child=serializers.CharField(), required=False, default=[])
+    model = serializers.CharField(default='gpt-4o-mini')
+
+class AgentRoleDesignerRequestSerializer(serializers.Serializer):
+    role_description = serializers.CharField()
+    domain = serializers.CharField(required=False, default='')
+    constraints = serializers.CharField(required=False, default='')
+    model = serializers.CharField(default='gpt-4o-mini')
+
+class CoordinatorRouterRequestSerializer(serializers.Serializer):
+    task = serializers.CharField()
+    agents = serializers.ListField(child=serializers.CharField(), required=False, default=[])
+    model = serializers.CharField(default='gpt-4o-mini')
+
+# --- Phase 15: Auto-Optimization Serializers ---
+
+class APEStudioRequestSerializer(serializers.Serializer):
+    task_description = serializers.CharField()
+    examples = serializers.CharField(required=False, default='')
+    model = serializers.CharField(default='gpt-4o-mini')
+
+class PromptEvolutionRequestSerializer(serializers.Serializer):
+    initial_prompt = serializers.CharField()
+    feedback = serializers.CharField(required=False, default='')
+    num_generations = serializers.IntegerField(default=4, min_value=2, max_value=8)
+    model = serializers.CharField(default='gpt-4o-mini')
+
+class MetaPromptRequestSerializer(serializers.Serializer):
+    domain = serializers.CharField()
+    task_type = serializers.CharField(required=False, default='')
+    requirements = serializers.CharField(required=False, default='')
+    model = serializers.CharField(default='gpt-4o-mini')
+
+# --- Phase 16: Safety & Verification Serializers ---
+
+class GuardrailBuilderRequestSerializer(serializers.Serializer):
+    system_prompt = serializers.CharField()
+    use_case = serializers.CharField(required=False, default='')
+    risk_level = serializers.CharField(default='medium')
+    model = serializers.CharField(default='gpt-4o-mini')
+
+class SelfVerificationRequestSerializer(serializers.Serializer):
+    task = serializers.CharField()
+    input_text = serializers.CharField()
+    model = serializers.CharField(default='gpt-4o-mini')
+
+# --- Phase 17: Context & Memory Serializers ---
+
+class ContextPackerRequestSerializer(serializers.Serializer):
+    content = serializers.CharField()
+    token_budget = serializers.IntegerField(default=4000, min_value=100, max_value=128000)
+    model = serializers.CharField(default='gpt-4o-mini')
+
+class MemoryAwareRequestSerializer(serializers.Serializer):
+    task_description = serializers.CharField()
+    conversation_type = serializers.CharField(required=False, default='')
+    context_requirements = serializers.CharField(required=False, default='')
+    model = serializers.CharField(default='gpt-4o-mini')

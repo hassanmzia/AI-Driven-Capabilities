@@ -364,3 +364,77 @@ export const globalSearch = (query: string, scope?: string) =>
 // --- Seed ---
 export const seedPlatformData = () =>
   api.post('/api/v1/platform/seed-data/').then(r => r.data);
+
+// ==================================================================
+// Phase 13-17 APIs (Advanced Reasoning, Agent Patterns, Auto-Optimization, Safety, Context)
+// ==================================================================
+
+// --- Phase 13: Advanced Reasoning ---
+export const executeSelfConsistency = (data: {
+  question: string; num_paths?: number; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/self-consistency/', data).then(r => r.data);
+
+export const executeTreeOfThoughts = (data: {
+  problem: string; num_branches?: number; max_depth?: number; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/tree-of-thoughts/', data).then(r => r.data);
+
+export const executeReflectionLoop = (data: {
+  task: string; input_text: string; num_rounds?: number; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/reflection-loop/', data).then(r => r.data);
+
+// --- Phase 14: Agent Patterns ---
+export const executeReActAgent = (data: {
+  task: string; available_tools?: string[]; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/react-agent/', data).then(r => r.data);
+
+export const executeAgentRoleDesigner = (data: {
+  role_description: string; domain?: string; constraints?: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/agent-role-designer/', data).then(r => r.data);
+
+export const executeCoordinatorRouter = (data: {
+  task: string; agents?: string[]; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/coordinator-router/', data).then(r => r.data);
+
+// --- Phase 15: Auto-Optimization ---
+export const executeAPEStudio = (data: {
+  task_description: string; examples?: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/ape-studio/', data).then(r => r.data);
+
+export const executePromptEvolution = (data: {
+  initial_prompt: string; feedback?: string; num_generations?: number; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/prompt-evolution/', data).then(r => r.data);
+
+export const executeMetaPrompt = (data: {
+  domain: string; task_type?: string; requirements?: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/meta-prompt/', data).then(r => r.data);
+
+// --- Phase 16: Safety & Verification ---
+export const executeGuardrailBuilder = (data: {
+  system_prompt: string; use_case?: string; risk_level?: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/guardrail-builder/', data).then(r => r.data);
+
+export const executeSelfVerification = (data: {
+  task: string; input_text: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/self-verification/', data).then(r => r.data);
+
+// --- Phase 17: Context & Memory ---
+export const executeContextPacker = (data: {
+  content: string; token_budget?: number; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/context-packer/', data).then(r => r.data);
+
+export const executeMemoryAware = (data: {
+  task_description: string; conversation_type?: string; context_requirements?: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/memory-aware/', data).then(r => r.data);

@@ -84,6 +84,24 @@ import { ModelComparison } from './pages/ModelComparison';
 // Phase 11-12: Community & Auth
 import { CommunityGallery } from './pages/CommunityGallery';
 import { AuthPage } from './pages/AuthPage';
+// Phase 13: Advanced Reasoning
+import { SelfConsistencyVoter } from './pages/SelfConsistencyVoter';
+import { TreeOfThoughts } from './pages/TreeOfThoughts';
+import { ReflectionLoop } from './pages/ReflectionLoop';
+// Phase 14: Agent Patterns
+import { ReActAgent } from './pages/ReActAgent';
+import { AgentRoleDesigner } from './pages/AgentRoleDesigner';
+import { CoordinatorRouter } from './pages/CoordinatorRouter';
+// Phase 15: Auto-Optimization
+import { APEStudio } from './pages/APEStudio';
+import { PromptEvolution } from './pages/PromptEvolution';
+import { MetaPromptDesigner } from './pages/MetaPromptDesigner';
+// Phase 16: Safety & Verification
+import { GuardrailBuilder } from './pages/GuardrailBuilder';
+import { SelfVerificationChain } from './pages/SelfVerificationChain';
+// Phase 17: Context & Memory
+import { ContextPackingStudio } from './pages/ContextPackingStudio';
+import { MemoryAwarePrompting } from './pages/MemoryAwarePrompting';
 
 type PageKey =
   | 'dashboard' | 'feedback' | 'meeting' | 'quiz' | 'slides'
@@ -97,7 +115,12 @@ type PageKey =
   | 'projects' | 'versions' | 'diff' | 'favorites'
   | 'testsuite' | 'batcheval' | 'benchmark' | 'consistency'
   | 'deployexport' | 'snippets' | 'costopt' | 'modelmatrix'
-  | 'gallery' | 'auth';
+  | 'gallery' | 'auth'
+  | 'selfconsistency' | 'tot' | 'reflection'
+  | 'react' | 'roledesigner' | 'coordinator'
+  | 'ape' | 'evolution' | 'metaprompt'
+  | 'guardrails' | 'selfverify'
+  | 'contextpack' | 'memoryaware';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageKey>('dashboard');
@@ -155,6 +178,24 @@ const App: React.FC = () => {
       // Phase 11-12: Community
       case 'gallery': return <CommunityGallery />;
       case 'auth': return <AuthPage />;
+      // Phase 13: Advanced Reasoning
+      case 'selfconsistency': return <SelfConsistencyVoter />;
+      case 'tot': return <TreeOfThoughts />;
+      case 'reflection': return <ReflectionLoop />;
+      // Phase 14: Agent Patterns
+      case 'react': return <ReActAgent />;
+      case 'roledesigner': return <AgentRoleDesigner />;
+      case 'coordinator': return <CoordinatorRouter />;
+      // Phase 15: Auto-Optimization
+      case 'ape': return <APEStudio />;
+      case 'evolution': return <PromptEvolution />;
+      case 'metaprompt': return <MetaPromptDesigner />;
+      // Phase 16: Safety & Verification
+      case 'guardrails': return <GuardrailBuilder />;
+      case 'selfverify': return <SelfVerificationChain />;
+      // Phase 17: Context & Memory
+      case 'contextpack': return <ContextPackingStudio />;
+      case 'memoryaware': return <MemoryAwarePrompting />;
       default: return <Dashboard />;
     }
   };

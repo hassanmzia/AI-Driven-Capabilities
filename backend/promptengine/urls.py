@@ -44,5 +44,23 @@ urlpatterns = [
     path('execute/rag-simulator/', views.rag_simulator, name='rag-simulator'),
     path('execute/scenario-simulator/', views.scenario_simulator, name='scenario-simulator'),
     path('execute/localizer/', views.localizer, name='localizer'),
+    # Phase 13: Advanced Reasoning
+    path('execute/self-consistency/', views.self_consistency, name='self-consistency'),
+    path('execute/tree-of-thoughts/', views.tree_of_thoughts, name='tree-of-thoughts'),
+    path('execute/reflection-loop/', views.reflection_loop, name='reflection-loop'),
+    # Phase 14: Agent Patterns
+    path('execute/react-agent/', views.react_agent, name='react-agent'),
+    path('execute/agent-role-designer/', views.agent_role_designer, name='agent-role-designer'),
+    path('execute/coordinator-router/', views.coordinator_router, name='coordinator-router'),
+    # Phase 15: Auto-Optimization
+    path('execute/ape-studio/', views.ape_studio, name='ape-studio'),
+    path('execute/prompt-evolution/', views.prompt_evolution, name='prompt-evolution'),
+    path('execute/meta-prompt/', views.meta_prompt, name='meta-prompt'),
+    # Phase 16: Safety & Verification
+    path('execute/guardrail-builder/', views.guardrail_builder, name='guardrail-builder'),
+    path('execute/self-verification/', views.self_verification, name='self-verification'),
+    # Phase 17: Context & Memory
+    path('execute/context-packer/', views.context_packer, name='context-packer'),
+    path('execute/memory-aware/', views.memory_aware, name='memory-aware'),
     path('health/', views.health_check, name='health-check'),
 ]
