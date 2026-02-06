@@ -124,6 +124,7 @@ type PageKey =
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageKey>('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -202,7 +203,7 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      <Sidebar currentPage={currentPage} onNavigate={(page) => setCurrentPage(page as PageKey)} />
+      <Sidebar currentPage={currentPage} onNavigate={(page) => setCurrentPage(page as PageKey)} isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       <main className="main-content">
         <ErrorBoundary key={currentPage}>
           {renderPage()}
