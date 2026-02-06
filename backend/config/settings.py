@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     'promptengine',
     'agents',
     'analytics',
-    'platform.apps.PlatformConfig',
+    'prompt_platform.apps.PlatformConfig',
 ]
 
 MIDDLEWARE = [
