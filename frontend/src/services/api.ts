@@ -43,18 +43,28 @@ export const executeCustomPrompt = (data: {
 
 // --- Export APIs ---
 
+const downloadBlob = (data: any, filename: string) => {
+  const url = window.URL.createObjectURL(new Blob([data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
 export const exportSlidesToPPTX = (executionId: string): Promise<void> =>
   api.post('/api/v1/export/slides-pptx/', { execution_id: executionId }, { responseType: 'blob' })
-    .then(response => {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'presentation.pptx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    });
+    .then(response => downloadBlob(response.data, 'presentation.pptx'));
+
+export const exportMeetingToDocx = (executionId: string): Promise<void> =>
+  api.post('/api/v1/export/meeting-docx/', { execution_id: executionId }, { responseType: 'blob' })
+    .then(response => downloadBlob(response.data, 'meeting_summary.docx'));
+
+export const exportQuizToDocx = (executionId: string): Promise<void> =>
+  api.post('/api/v1/export/quiz-docx/', { execution_id: executionId }, { responseType: 'blob' })
+    .then(response => downloadBlob(response.data, 'quiz.docx'));
 
 // --- Template APIs ---
 

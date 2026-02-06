@@ -215,6 +215,58 @@ def export_slides_pptx(request):
         return Response({'error': f'Failed to generate PowerPoint: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['POST'])
+def export_meeting_docx(request):
+    """Export a meeting summary execution to a Word document."""
+    execution_id = request.data.get('execution_id')
+    meeting_text = request.data.get('meeting_text')
+
+    if execution_id:
+        try:
+            execution = PromptExecution.objects.get(id=execution_id)
+            meeting_text = execution.output_data
+        except PromptExecution.DoesNotExist:
+            return Response({'error': 'Execution not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not meeting_text:
+        return Response({'error': 'No meeting data provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        buf = services.generate_meeting_docx(meeting_text)
+        response = FileResponse(buf, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = 'attachment; filename="meeting_summary.docx"'
+        return response
+    except Exception as e:
+        logger.error(f"Meeting DOCX generation failed: {e}")
+        return Response({'error': f'Failed to generate Word document: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def export_quiz_docx(request):
+    """Export a quiz execution to a Word document."""
+    execution_id = request.data.get('execution_id')
+    quiz_json = request.data.get('quiz_json')
+
+    if execution_id:
+        try:
+            execution = PromptExecution.objects.get(id=execution_id)
+            quiz_json = execution.output_data
+        except PromptExecution.DoesNotExist:
+            return Response({'error': 'Execution not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not quiz_json:
+        return Response({'error': 'No quiz data provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        buf = services.generate_quiz_docx(quiz_json)
+        response = FileResponse(buf, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = 'attachment; filename="quiz.docx"'
+        return response
+    except Exception as e:
+        logger.error(f"Quiz DOCX generation failed: {e}")
+        return Response({'error': f'Failed to generate Word document: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET'])
 def health_check(request):
     return Response({'status': 'healthy', 'service': 'prompt-engine-backend'})

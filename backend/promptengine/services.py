@@ -224,16 +224,178 @@ def execute_custom_prompt(system_prompt='', user_prompt='', model='gpt-4o-mini',
     return execute_prompt(system_prompt, user_prompt, model, temperature, max_tokens)
 
 
-def _sanitize_slide_json(text):
-    """Clean LLM output to extract valid JSON for slide data."""
-    # Strip markdown code blocks
+def _sanitize_json(text):
+    """Clean LLM output to extract valid JSON."""
     cleaned = re.sub(r'```(?:json)?\s*\n?', '', text).strip()
     cleaned = cleaned.rstrip('`').strip()
-    # Fix unquoted NULL/TRUE/FALSE
     cleaned = re.sub(r':\s*NULL\b', ': null', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r':\s*TRUE\b', ': true', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r':\s*FALSE\b', ': false', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r',\s*([}\]])', r'\1', cleaned)  # trailing commas
+    cleaned = re.sub(r',\s*([}\]])', r'\1', cleaned)
+    return cleaned
+
+
+def generate_meeting_docx(meeting_text):
+    """Convert meeting summary text into a Word document. Returns BytesIO buffer."""
+    from docx import Document
+    from docx.shared import Pt, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+    doc = Document()
+
+    # Style the default font
+    style = doc.styles['Normal']
+    font = style.font
+    font.name = 'Calibri'
+    font.size = Pt(11)
+    font.color.rgb = RGBColor(0x33, 0x33, 0x33)
+
+    # Title
+    title = doc.add_heading('Meeting Summary', level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for run in title.runs:
+        run.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
+
+    doc.add_paragraph('')  # spacer
+
+    # Parse the meeting text into sections
+    lines = meeting_text.strip().split('\n')
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        # Detect section headers (numbered like "1. Date..." or markdown headings)
+        heading_match = re.match(r'^(?:#{1,3}\s+|(\d+)\.\s*)(.*)', stripped)
+        if heading_match:
+            heading_text = heading_match.group(2) if heading_match.group(2) else heading_match.group(0)
+            is_section = heading_match.group(1) is not None or stripped.startswith('#')
+            if is_section:
+                h = doc.add_heading(heading_text.strip().rstrip(':'), level=2)
+                for run in h.runs:
+                    run.font.color.rgb = RGBColor(0x6C, 0x6C, 0xF4)
+                continue
+
+        # Detect bullet points
+        bullet_match = re.match(r'^[-*\u2022]\s+(.*)', stripped)
+        if bullet_match:
+            doc.add_paragraph(bullet_match.group(1), style='List Bullet')
+            continue
+
+        # Detect sub-items (indented bullets)
+        sub_match = re.match(r'^\s+[-*\u2022]\s+(.*)', line)
+        if sub_match:
+            doc.add_paragraph(sub_match.group(1), style='List Bullet 2')
+            continue
+
+        # Bold key-value pairs like "Date: October 1st" or "**Date**: October 1st"
+        kv_match = re.match(r'^(?:\*\*)?([^:*]{2,35})(?:\*\*)?:\s*(.*)', stripped)
+        if kv_match:
+            p = doc.add_paragraph()
+            run_key = p.add_run(kv_match.group(1).strip() + ': ')
+            run_key.bold = True
+            run_key.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
+            p.add_run(kv_match.group(2).strip())
+            continue
+
+        # Regular paragraph - strip markdown bold markers
+        clean_text = re.sub(r'\*\*(.+?)\*\*', r'\1', stripped)
+        doc.add_paragraph(clean_text)
+
+    buf = io.BytesIO()
+    doc.save(buf)
+    buf.seek(0)
+    return buf
+
+
+def generate_quiz_docx(quiz_json_str):
+    """Convert quiz JSON into a Word document. Returns BytesIO buffer."""
+    from docx import Document
+    from docx.shared import Pt, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+    # Parse quiz data
+    sanitized = _sanitize_json(quiz_json_str)
+    start = sanitized.find('[')
+    end = sanitized.rfind(']')
+    if start >= 0 and end > start:
+        sanitized = sanitized[start:end + 1]
+    questions = json.loads(sanitized)
+    if not isinstance(questions, list):
+        questions = [questions]
+
+    doc = Document()
+
+    # Style
+    style = doc.styles['Normal']
+    font = style.font
+    font.name = 'Calibri'
+    font.size = Pt(11)
+    font.color.rgb = RGBColor(0x33, 0x33, 0x33)
+
+    # Title
+    title = doc.add_heading('Training Quiz', level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for run in title.runs:
+        run.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
+
+    doc.add_paragraph(f'Total Questions: {len(questions)}')
+    doc.add_paragraph('')
+
+    # Questions section
+    doc.add_heading('Questions', level=1)
+
+    for i, q in enumerate(questions, 1):
+        question_text = q.get('question', f'Question {i}')
+        difficulty = q.get('difficulty', '')
+
+        # Question heading
+        p = doc.add_paragraph()
+        run_num = p.add_run(f'Q{i}. ')
+        run_num.bold = True
+        run_num.font.size = Pt(12)
+        run_num.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
+        run_q = p.add_run(question_text)
+        run_q.font.size = Pt(12)
+        if difficulty:
+            run_diff = p.add_run(f'  [{difficulty}]')
+            run_diff.font.size = Pt(9)
+            run_diff.font.color.rgb = RGBColor(0x6C, 0x6C, 0xF4)
+            run_diff.italic = True
+
+        # Options
+        options = q.get('options', [])
+        for j, opt in enumerate(options):
+            letter = chr(65 + j)
+            p = doc.add_paragraph()
+            p.paragraph_format.left_indent = Pt(24)
+            run = p.add_run(f'{letter}) {opt}')
+            run.font.size = Pt(11)
+
+        doc.add_paragraph('')
+
+    # Answer key on new page
+    doc.add_page_break()
+    doc.add_heading('Answer Key', level=1)
+
+    for i, q in enumerate(questions, 1):
+        correct = q.get('correct_answer', 'N/A')
+        p = doc.add_paragraph()
+        run_num = p.add_run(f'Q{i}: ')
+        run_num.bold = True
+        run_ans = p.add_run(str(correct))
+        run_ans.font.color.rgb = RGBColor(0x22, 0x8B, 0x22)
+        run_ans.bold = True
+
+    buf = io.BytesIO()
+    doc.save(buf)
+    buf.seek(0)
+    return buf
+
+
+def _sanitize_slide_json(text):
+    """Clean LLM output to extract valid JSON for slide data."""
+    cleaned = _sanitize_json(text)
     # Find the JSON array
     start = cleaned.find('[')
     end = cleaned.rfind(']')

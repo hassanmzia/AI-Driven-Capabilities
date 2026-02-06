@@ -19,5 +19,7 @@ urlpatterns = [
     path('execute/complaint-response/', views.complaint_response, name='complaint-response'),
     path('execute/custom/', views.custom_prompt, name='custom-prompt'),
     path('export/slides-pptx/', views.export_slides_pptx, name='export-slides-pptx'),
+    path('export/meeting-docx/', views.export_meeting_docx, name='export-meeting-docx'),
+    path('export/quiz-docx/', views.export_quiz_docx, name='export-quiz-docx'),
     path('health/', views.health_check, name='health-check'),
 ]
