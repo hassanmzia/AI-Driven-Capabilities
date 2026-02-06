@@ -60,7 +60,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div className="grid-2-col">
             <div className="card">
               <div className="card-title" style={{ marginBottom: '1rem' }}>Usage by Category</div>
               {stats?.category_breakdown?.length ? (
@@ -102,7 +102,7 @@ export const Dashboard: React.FC = () => {
 
           <div className="card" style={{ marginTop: '1.5rem' }}>
             <div className="card-title" style={{ marginBottom: '1rem' }}>Platform Capabilities</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+            <div className="grid-3-col">
               {[
                 { title: 'MCP Protocol', desc: 'Model Context Protocol for tool discovery and execution', badge: 'Active' },
                 { title: 'A2A Protocol', desc: 'Agent-to-Agent communication for multi-agent workflows', badge: 'Active' },

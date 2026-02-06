@@ -24,7 +24,7 @@ export const FeatureLayout: React.FC<FeatureLayoutProps> = ({
         <p>{description}</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+      <div className="grid-2-col">
         <div>
           <div className="card">
             <div className="card-header">

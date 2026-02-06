@@ -376,7 +376,7 @@ export const AuthPage: React.FC = () => {
             </div>
 
             {/* Name Fields */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="form-row" style={{ marginBottom: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>First Name</label>
                 <input className="form-input" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} placeholder="First name" />
@@ -400,7 +400,7 @@ export const AuthPage: React.FC = () => {
             </div>
 
             {/* Company & Job Title */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="form-row" style={{ marginBottom: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Company</label>
                 <input className="form-input" value={editCompany} onChange={(e) => setEditCompany(e.target.value)} placeholder="Company name" />
@@ -452,7 +452,7 @@ export const AuthPage: React.FC = () => {
 
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Account Details</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', padding: '1rem', background: 'var(--bg-tertiary, rgba(255,255,255,0.03))', borderRadius: '0.375rem' }}>
+              <div className="form-row" style={{ padding: '1rem', background: 'var(--bg-tertiary, rgba(255,255,255,0.03))', borderRadius: '0.375rem' }}>
                 <div>
                   <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Username</span>
                   <p style={{ color: 'var(--text-primary)', margin: '0.25rem 0 0', fontWeight: 500 }}>{user.username}</p>
@@ -578,7 +578,7 @@ export const AuthPage: React.FC = () => {
             <div className="card-header" style={{ paddingLeft: 0 }}>
               <div className="card-title" style={{ color: 'var(--text-primary)' }}>Create Account</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="form-row">
               <div className="form-group">
                 <label className="form-label">First Name</label>
                 <input className="form-input" placeholder="First name" value={regFirstName} onChange={(e) => setRegFirstName(e.target.value)} />

@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 interface SidebarProps {
   currentPage: string;
   onNavigate: (page: string) => void;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 interface NavItem {
@@ -206,33 +208,64 @@ const CollapsibleSection: React.FC<{
   );
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, isOpen, onToggle }) => {
+  const handleNavigate = (page: string) => {
+    onNavigate(page);
+    // Close sidebar on mobile after navigation
+    if (window.innerWidth <= 768) {
+      onToggle();
+    }
+  };
+
   return (
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <h1>PromptForge</h1>
-        <p>AI Prompt Engineering IDE</p>
+    <>
+      {/* Mobile header with hamburger */}
+      <div className="mobile-header">
+        <button
+          className={`hamburger-btn ${isOpen ? 'open' : ''}`}
+          onClick={onToggle}
+          aria-label="Toggle navigation"
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+        <span className="mobile-header-title">PromptForge</span>
       </div>
 
-      <nav>
-        <div className="nav-section">
-          <button
-            className={`nav-item ${currentPage === 'dashboard' ? 'active' : ''}`}
-            onClick={() => onNavigate('dashboard')}
-          >
-            <span>📈</span> Dashboard
-          </button>
+      {/* Mobile overlay */}
+      <div
+        className={`sidebar-overlay ${isOpen ? 'visible' : ''}`}
+        onClick={onToggle}
+      />
+
+      {/* Sidebar */}
+      <aside className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
+        <div className="sidebar-logo">
+          <h1>PromptForge</h1>
+          <p>AI Prompt Engineering IDE</p>
         </div>
 
-        {sections.map((section) => (
-          <CollapsibleSection
-            key={section.title}
-            section={section}
-            currentPage={currentPage}
-            onNavigate={onNavigate}
-          />
-        ))}
-      </nav>
-    </aside>
+        <nav>
+          <div className="nav-section">
+            <button
+              className={`nav-item ${currentPage === 'dashboard' ? 'active' : ''}`}
+              onClick={() => handleNavigate('dashboard')}
+            >
+              <span>📈</span> Dashboard
+            </button>
+          </div>
+
+          {sections.map((section) => (
+            <CollapsibleSection
+              key={section.title}
+              section={section}
+              currentPage={currentPage}
+              onNavigate={handleNavigate}
+            />
+          ))}
+        </nav>
+      </aside>
+    </>
   );
 };
