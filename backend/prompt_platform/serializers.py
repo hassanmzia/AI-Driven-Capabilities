@@ -18,21 +18,40 @@ class RegisterSerializer(serializers.Serializer):
     last_name = serializers.CharField(required=False, default='')
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar_color', 'profile_picture', 'onboarding_completed', 'theme',
+                  'phone', 'address', 'bio', 'company', 'job_title']
+
+
 class UserSerializer(serializers.ModelSerializer):
     theme = serializers.CharField(source='profile.theme', read_only=True, default='dark')
     onboarding_completed = serializers.BooleanField(source='profile.onboarding_completed', read_only=True, default=False)
     avatar_color = serializers.CharField(source='profile.avatar_color', read_only=True, default='#6366f1')
+    profile_picture = serializers.CharField(source='profile.profile_picture', read_only=True, default='')
+    phone = serializers.CharField(source='profile.phone', read_only=True, default='')
+    address = serializers.CharField(source='profile.address', read_only=True, default='')
+    bio = serializers.CharField(source='profile.bio', read_only=True, default='')
+    company = serializers.CharField(source='profile.company', read_only=True, default='')
+    job_title = serializers.CharField(source='profile.job_title', read_only=True, default='')
 
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name',
-                  'theme', 'onboarding_completed', 'avatar_color', 'date_joined']
+                  'theme', 'onboarding_completed', 'avatar_color', 'profile_picture',
+                  'phone', 'address', 'bio', 'company', 'job_title', 'date_joined']
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ['avatar_color', 'onboarding_completed', 'theme']
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=8)
+
+
+class UpdateUserInfoSerializer(serializers.Serializer):
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
 
 
 # --- Projects & Workspace ---

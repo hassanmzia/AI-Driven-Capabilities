@@ -247,8 +247,25 @@ export const refreshToken = (refresh: string): Promise<{ access: string }> =>
 export const getMe = (): Promise<{ user: UserInfo | null }> =>
   api.get('/api/v1/platform/auth/me/').then(r => r.data);
 
-export const updateProfile = (data: { theme?: string; onboarding_completed?: boolean; avatar_color?: string }) =>
+export const updateProfile = (data: {
+  theme?: string; onboarding_completed?: boolean; avatar_color?: string;
+  profile_picture?: string; phone?: string; address?: string; bio?: string;
+  company?: string; job_title?: string;
+}): Promise<UserInfo> =>
   api.patch('/api/v1/platform/auth/profile/', data).then(r => r.data);
+
+export const updateUserInfo = (data: {
+  first_name?: string; last_name?: string; email?: string;
+}): Promise<UserInfo> =>
+  api.patch('/api/v1/platform/auth/user-info/', data).then(r => r.data);
+
+export const changePassword = (data: {
+  current_password: string; new_password: string;
+}): Promise<{ message: string; access: string; refresh: string }> =>
+  api.post('/api/v1/platform/auth/change-password/', data).then(r => r.data);
+
+export const deleteAccount = (password: string): Promise<{ message: string }> =>
+  api.delete('/api/v1/platform/auth/delete-account/', { data: { password } }).then(r => r.data);
 
 // --- Projects ---
 export const getProjects = (): Promise<{ results: PromptProject[] }> =>

@@ -17,6 +17,7 @@ from .models import (
 )
 from .serializers import (
     RegisterSerializer, UserSerializer, UserProfileSerializer,
+    ChangePasswordSerializer, UpdateUserInfoSerializer,
     PromptProjectSerializer, PromptCollectionSerializer, PromptFavoriteSerializer,
     TestSuiteSerializer, TestCaseSerializer, TestRunSerializer,
     TutorialSerializer, TutorialProgressSerializer,
@@ -74,7 +75,67 @@ def update_profile(request):
     serializer = UserProfileSerializer(profile, data=request.data, partial=True)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    return Response(serializer.data)
+    return Response(UserSerializer(request.user).data)
+
+
+@api_view(['PATCH'])
+def update_user_info(request):
+    """Update user's basic info (name, email)."""
+    if not request.user.is_authenticated:
+        return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    serializer = UpdateUserInfoSerializer(data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    data = serializer.validated_data
+
+    user = request.user
+    if 'email' in data:
+        if User.objects.filter(email=data['email']).exclude(id=user.id).exists():
+            return Response({'error': 'Email already in use'}, status=status.HTTP_400_BAD_REQUEST)
+        user.email = data['email']
+    if 'first_name' in data:
+        user.first_name = data['first_name']
+    if 'last_name' in data:
+        user.last_name = data['last_name']
+    user.save()
+    return Response(UserSerializer(user).data)
+
+
+@api_view(['POST'])
+def change_password(request):
+    """Change the user's password."""
+    if not request.user.is_authenticated:
+        return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    serializer = ChangePasswordSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    data = serializer.validated_data
+
+    if not request.user.check_password(data['current_password']):
+        return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+    request.user.set_password(data['new_password'])
+    request.user.save()
+
+    # Generate new tokens since password changed
+    refresh = RefreshToken.for_user(request.user)
+    return Response({
+        'message': 'Password changed successfully',
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+    })
+
+
+@api_view(['DELETE'])
+def delete_account(request):
+    """Permanently delete the user's account and all associated data."""
+    if not request.user.is_authenticated:
+        return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    password = request.data.get('password', '')
+    if not request.user.check_password(password):
+        return Response({'error': 'Password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+    request.user.delete()
+    return Response({'message': 'Account deleted successfully'}, status=status.HTTP_200_OK)
 
 
 # --- CRUD ViewSets ---

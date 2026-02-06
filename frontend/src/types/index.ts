@@ -182,6 +182,13 @@ export interface UserInfo {
   theme: string;
   onboarding_completed: boolean;
   avatar_color: string;
+  profile_picture: string;
+  phone: string;
+  address: string;
+  bio: string;
+  company: string;
+  job_title: string;
+  date_joined: string;
 }
 
 export interface PromptProject {
