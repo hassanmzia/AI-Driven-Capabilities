@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { ExecutionResult, DashboardStats, PromptTemplate, PromptExecution, MCPTool, AgentCard } from '../types';
+import type { ExecutionResult, CompareResult, DashboardStats, PromptTemplate, PromptExecution, MCPTool, AgentCard } from '../types';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://172.168.1.95:4070';
 
@@ -65,6 +65,53 @@ export const exportMeetingToDocx = (executionId: string): Promise<void> =>
 export const exportQuizToDocx = (executionId: string): Promise<void> =>
   api.post('/api/v1/export/quiz-docx/', { execution_id: executionId }, { responseType: 'blob' })
     .then(response => downloadBlob(response.data, 'quiz.docx'));
+
+// --- Advanced Prompt Engineering APIs ---
+
+export const executePromptGrader = (data: {
+  prompt_text: string; task_type?: string; domain?: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/prompt-grader/', data).then(r => r.data);
+
+export const executePromptOptimizer = (data: {
+  prompt_text: string; grading_output: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/prompt-optimizer/', data).then(r => r.data);
+
+export const executePromptCompare = (data: {
+  prompt_a: string; prompt_b: string; test_input: string; model?: string;
+}): Promise<CompareResult> =>
+  api.post('/api/v1/execute/prompt-compare/', data).then(r => r.data);
+
+export const executeSchemaEnforcer = (data: {
+  prompt_text: string; schema_text: string; input_text: string; max_retries?: number; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/schema-enforcer/', data).then(r => r.data);
+
+export const executeSelfCorrecting = (data: {
+  prompt_text: string; input_text: string; criteria?: string; max_rounds?: number; threshold?: number; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/self-correcting/', data).then(r => r.data);
+
+export const executeQualityPipeline = (data: {
+  task_prompt: string; input_text: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/quality-pipeline/', data).then(r => r.data);
+
+export const executeDecomposition = (data: {
+  task_description: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/decomposition/', data).then(r => r.data);
+
+export const executeInjectionTester = (data: {
+  system_prompt: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/injection-tester/', data).then(r => r.data);
+
+export const executeFewShotBuilder = (data: {
+  task_description: string; examples: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/fewshot-builder/', data).then(r => r.data);
 
 // --- Template APIs ---
 

@@ -13,6 +13,11 @@ from .serializers import (
     QuizGeneratorRequestSerializer, SlideScriptRequestSerializer,
     ComplaintResponseRequestSerializer, CustomPromptRequestSerializer,
     RatingSerializer,
+    PromptGraderRequestSerializer, PromptOptimizerRequestSerializer,
+    PromptCompareRequestSerializer, SchemaEnforcerRequestSerializer,
+    SelfCorrectingRequestSerializer, QualityPipelineRequestSerializer,
+    DecompositionRequestSerializer, InjectionTesterRequestSerializer,
+    FewShotBuilderRequestSerializer,
 )
 from . import services
 
@@ -265,6 +270,147 @@ def export_quiz_docx(request):
     except Exception as e:
         logger.error(f"Quiz DOCX generation failed: {e}")
         return Response({'error': f'Failed to generate Word document: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# --- Advanced Feature Views ---
+
+def _execute_advanced(request, category, serializer_class, service_fn, extract_args):
+    """Generic helper for advanced features that may return multi-step outputs."""
+    serializer = serializer_class(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    data = serializer.validated_data
+
+    args = extract_args(data)
+    result = service_fn(**args)
+
+    execution = PromptExecution.objects.create(
+        category=category,
+        input_data=str(data),
+        system_prompt=services.ADVANCED_PROMPTS.get(category, ''),
+        user_prompt=str(args),
+        output_data=result.get('output', ''),
+        status='completed' if 'error' not in result else 'failed',
+        model_used=result.get('model', 'gpt-4o-mini'),
+        tokens_input=result.get('tokens_input', 0),
+        tokens_output=result.get('tokens_output', 0),
+        cost_estimate=result.get('cost_estimate', 0),
+        latency_ms=result.get('latency_ms', 0),
+        error_message=result.get('error', ''),
+    )
+
+    resp = {
+        'execution_id': str(execution.id),
+        'output': result.get('output', ''),
+        'error': result.get('error'),
+        'tokens_input': result.get('tokens_input', 0),
+        'tokens_output': result.get('tokens_output', 0),
+        'cost_estimate': float(result.get('cost_estimate', 0)),
+        'latency_ms': result.get('latency_ms', 0),
+        'model': result.get('model', 'gpt-4o-mini'),
+    }
+    # Include extra fields for multi-output features
+    for key in ('output_a', 'output_b'):
+        if key in result:
+            resp[key] = result[key]
+
+    return Response(resp, status=status.HTTP_200_OK if 'error' not in result else status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def prompt_grader(request):
+    return _execute_advanced(
+        request, 'prompt_grader',
+        PromptGraderRequestSerializer,
+        services.grade_prompt,
+        lambda d: {'prompt_text': d['prompt_text'], 'task_type': d['task_type'], 'domain': d['domain'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def prompt_optimizer(request):
+    return _execute_advanced(
+        request, 'prompt_optimizer',
+        PromptOptimizerRequestSerializer,
+        services.optimize_prompt,
+        lambda d: {'prompt_text': d['prompt_text'], 'grading_output': d['grading_output'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def prompt_compare(request):
+    return _execute_advanced(
+        request, 'prompt_compare',
+        PromptCompareRequestSerializer,
+        services.compare_prompt_outputs,
+        lambda d: {'prompt_a': d['prompt_a'], 'prompt_b': d['prompt_b'], 'test_input': d['test_input'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def schema_enforcer(request):
+    return _execute_advanced(
+        request, 'schema_enforcer',
+        SchemaEnforcerRequestSerializer,
+        services.enforce_schema,
+        lambda d: {
+            'prompt_text': d['prompt_text'], 'schema_text': d['schema_text'],
+            'input_text': d['input_text'], 'max_retries': d['max_retries'], 'model': d['model']
+        }
+    )
+
+
+@api_view(['POST'])
+def self_correcting(request):
+    return _execute_advanced(
+        request, 'self_correcting',
+        SelfCorrectingRequestSerializer,
+        services.execute_self_correcting,
+        lambda d: {
+            'prompt_text': d['prompt_text'], 'input_text': d['input_text'],
+            'criteria': d['criteria'], 'max_rounds': d['max_rounds'],
+            'threshold': d['threshold'], 'model': d['model']
+        }
+    )
+
+
+@api_view(['POST'])
+def quality_pipeline(request):
+    return _execute_advanced(
+        request, 'quality_pipeline',
+        QualityPipelineRequestSerializer,
+        services.execute_quality_pipeline,
+        lambda d: {'task_prompt': d['task_prompt'], 'input_text': d['input_text'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def decomposition(request):
+    return _execute_advanced(
+        request, 'decomposition',
+        DecompositionRequestSerializer,
+        services.execute_decomposition,
+        lambda d: {'task_description': d['task_description'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def injection_tester(request):
+    return _execute_advanced(
+        request, 'injection_tester',
+        InjectionTesterRequestSerializer,
+        services.test_prompt_injection,
+        lambda d: {'system_prompt': d['system_prompt'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def fewshot_builder(request):
+    return _execute_advanced(
+        request, 'fewshot_builder',
+        FewShotBuilderRequestSerializer,
+        services.build_fewshot_prompt,
+        lambda d: {'task_description': d['task_description'], 'examples_json': d['examples'], 'model': d['model']}
+    )
 
 
 @api_view(['GET'])

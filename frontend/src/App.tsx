@@ -11,10 +11,20 @@ import { TemplateLibrary } from './pages/TemplateLibrary';
 import { ExecutionHistory } from './pages/ExecutionHistory';
 import { MultiAgentWorkflow } from './pages/MultiAgentWorkflow';
 import { MCPExplorer } from './pages/MCPExplorer';
+import { PromptGrader } from './pages/PromptGrader';
+import { ABTester } from './pages/ABTester';
+import { SchemaEnforcer } from './pages/SchemaEnforcer';
+import { SelfCorrectingLoop } from './pages/SelfCorrectingLoop';
+import { QualityGatePipeline } from './pages/QualityGatePipeline';
+import { DecompositionWorkflow } from './pages/DecompositionWorkflow';
+import { InjectionTester } from './pages/InjectionTester';
+import { FewShotBuilder } from './pages/FewShotBuilder';
 
 type PageKey =
   | 'dashboard' | 'feedback' | 'meeting' | 'quiz' | 'slides'
-  | 'complaint' | 'custom' | 'templates' | 'history' | 'agents' | 'mcp';
+  | 'complaint' | 'custom' | 'templates' | 'history' | 'agents' | 'mcp'
+  | 'grader' | 'abtester' | 'schema' | 'selfcorrect' | 'qualitygate'
+  | 'decompose' | 'injection' | 'fewshot';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageKey>('dashboard');
@@ -32,6 +42,14 @@ const App: React.FC = () => {
       case 'history': return <ExecutionHistory />;
       case 'agents': return <MultiAgentWorkflow />;
       case 'mcp': return <MCPExplorer />;
+      case 'grader': return <PromptGrader />;
+      case 'abtester': return <ABTester />;
+      case 'schema': return <SchemaEnforcer />;
+      case 'selfcorrect': return <SelfCorrectingLoop />;
+      case 'qualitygate': return <QualityGatePipeline />;
+      case 'decompose': return <DecompositionWorkflow />;
+      case 'injection': return <InjectionTester />;
+      case 'fewshot': return <FewShotBuilder />;
       default: return <Dashboard />;
     }
   };
