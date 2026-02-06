@@ -43,8 +43,8 @@ app.set('broadcast', broadcast);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
   origin: [
-    'http://172.168.1.95:3070',
-    'http://localhost:3070',
+    'http://172.168.1.95:3080',
+    'http://localhost:3080',
   ],
   credentials: true,
 }));
