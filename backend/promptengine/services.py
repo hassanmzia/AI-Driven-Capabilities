@@ -428,6 +428,193 @@ ADVANCED_PROMPTS = {
         "- Add chain-of-thought if reasoning is needed\n"
         "Return ONLY valid JSON."
     ),
+
+    # --- Phase 4: Knowledge Workflows ---
+
+    'expert_panel_persona': (
+        "You are {persona_name}, a {persona_description}. "
+        "You are participating in an expert panel discussion on the following topic.\n\n"
+        "Provide your perspective based on your expertise and role. Be specific, "
+        "insightful, and grounded in your domain knowledge. Express your unique viewpoint "
+        "including potential concerns, opportunities, and recommendations from your perspective.\n\n"
+        "Keep your response focused and substantive (200-400 words)."
+    ),
+
+    'expert_panel_moderator': (
+        "You are a skilled moderator synthesizing an expert panel discussion.\n\n"
+        "Multiple experts have shared their perspectives on a topic. Analyze all perspectives and produce:\n"
+        "{\n"
+        '  "consensus_points": ["<points where experts agree>"],\n'
+        '  "disagreements": ["<points of contention with brief explanation>"],\n'
+        '  "key_insights": ["<most valuable unique insights from the discussion>"],\n'
+        '  "recommendation": "<synthesized recommendation considering all perspectives>",\n'
+        '  "risk_factors": ["<risks identified across all perspectives>"],\n'
+        '  "next_steps": ["<suggested next actions>"]\n'
+        "}\n\n"
+        "Be balanced and fair to all perspectives. Return ONLY valid JSON."
+    ),
+
+    'document_qa': (
+        "You are a document analysis expert. You will be given multiple source documents "
+        "and a question. Answer the question using ONLY information from the provided sources.\n\n"
+        "Rules:\n"
+        "1. Cite sources using [Source N] format where N is the source number\n"
+        "2. Every factual claim MUST have a citation\n"
+        "3. If the sources don't contain enough information, say so explicitly\n"
+        "4. Synthesize information across sources when relevant\n"
+        "5. Distinguish between what sources state vs. your inferences\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "answer": "<comprehensive answer with inline [Source N] citations>",\n'
+        '  "sources_used": [<list of source numbers used>],\n'
+        '  "confidence": "<high|medium|low>",\n'
+        '  "key_findings": [\n'
+        '    {"finding": "<key finding>", "sources": [<source numbers>]}\n'
+        "  ],\n"
+        '  "gaps": ["<information gaps or questions that sources cannot answer>"]\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    'compliance_checker': (
+        "You are a compliance auditor. Given a policy/SOP document and a document to check, "
+        "evaluate compliance against each rule or requirement in the policy.\n\n"
+        "For each rule/requirement identified in the policy:\n"
+        "1. Extract the rule\n"
+        "2. Check if the document complies\n"
+        "3. Provide evidence from the document\n"
+        "4. Suggest remediation if non-compliant\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "overall_status": "<compliant|partially_compliant|non_compliant>",\n'
+        '  "compliance_score": <percentage 0-100>,\n'
+        '  "rules_checked": <total number of rules>,\n'
+        '  "rules_passed": <number passing>,\n'
+        '  "scorecard": [\n'
+        '    {"rule_id": <number>, "rule": "<rule description>", "status": "<compliant|non_compliant|partial>", "evidence": "<evidence from document>", "recommendation": "<fix if needed>"}\n'
+        "  ],\n"
+        '  "critical_issues": ["<any critical non-compliance items>"],\n'
+        '  "summary": "<overall compliance assessment>"\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    # --- Phase 5: Specialized Tools ---
+
+    'tone_transformer': (
+        "You are a professional writing style expert. Transform the given text into the "
+        "requested tone/style while preserving the original meaning completely.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "transformed_text": "<the rewritten text in the target tone>",\n'
+        '  "changes_made": ["<list of specific changes and why>"],\n'
+        '  "readability_metrics": {\n'
+        '    "estimated_grade_level": <number>,\n'
+        '    "word_count": <number>,\n'
+        '    "sentence_count": <number>,\n'
+        '    "avg_words_per_sentence": <number>\n'
+        "  },\n"
+        '  "tone_analysis": {\n'
+        '    "original_tone": "<detected tone of input>",\n'
+        '    "target_tone": "<the requested tone>",\n'
+        '    "confidence": "<high|medium|low>"\n'
+        "  }\n"
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    'misconception_detector': (
+        "You are an educational assessment expert specializing in identifying and correcting "
+        "misconceptions. Analyze the student's answer for the given topic.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "classification": "<correct|partially_correct|incorrect>",\n'
+        '  "score": <0-100>,\n'
+        '  "correct_elements": ["<parts of the answer that are correct>"],\n'
+        '  "misconceptions": [\n'
+        '    {"claim": "<what the student said>", "issue": "<why it is wrong>", "correction": "<the correct information>", "severity": "<critical|moderate|minor>"}\n'
+        "  ],\n"
+        '  "missing_concepts": ["<important concepts not mentioned>"],\n'
+        '  "feedback": "<constructive feedback for the student>",\n'
+        '  "suggested_resources": ["<topics to review>"]\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    'cot_visualizer': (
+        "You are a step-by-step reasoning expert. Solve the given problem showing ALL "
+        "your reasoning steps explicitly.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "steps": [\n'
+        '    {"step_number": <n>, "title": "<short title>", "reasoning": "<detailed reasoning>", "result": "<intermediate result>", "confidence": <1-10>}\n'
+        "  ],\n"
+        '  "final_answer": "<the final answer>",\n'
+        '  "reasoning_type": "<deductive|inductive|abductive|mathematical|analytical>",\n'
+        '  "total_steps": <number>,\n'
+        '  "weakest_step": <step number with lowest confidence>,\n'
+        '  "alternative_approaches": ["<other ways to solve this>"]\n'
+        "}\n"
+        "Show your work thoroughly. Return ONLY valid JSON."
+    ),
+
+    # --- Phase 6: Extended Features ---
+
+    'rag_retriever': (
+        "You are a document retrieval expert. Given a knowledge base split into chunks "
+        "and a query, rank the chunks by relevance to the query.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "ranked_chunks": [\n'
+        '    {"chunk_index": <n>, "relevance_score": <0.0-1.0>, "reason": "<why relevant>"}\n'
+        "  ],\n"
+        '  "query_analysis": "<what the query is looking for>"\n'
+        "}\n"
+        "Return ONLY valid JSON. Rank all chunks, most relevant first."
+    ),
+
+    'rag_generator': (
+        "You are a question-answering assistant. Answer the question using ONLY the "
+        "provided context chunks. Cite chunk numbers in [Chunk N] format.\n\n"
+        "If the context is insufficient, say so. Do not make up information."
+    ),
+
+    'scenario_simulator': (
+        "You are a scenario simulation expert. Given a plan or proposal and a set of "
+        "stakeholder roles, simulate how each stakeholder would react.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "stakeholder_reactions": [\n'
+        '    {"role": "<stakeholder role>", "reaction": "<likely reaction>", "concerns": ["<concerns>"], "support_level": "<strongly_support|support|neutral|oppose|strongly_oppose>", "conditions": "<conditions for support>"}\n'
+        "  ],\n"
+        '  "overall_viability": "<high|medium|low>",\n'
+        '  "critical_risks": ["<major risks identified>"],\n'
+        '  "recommended_modifications": ["<changes to improve acceptance>"],\n'
+        '  "consensus_path": "<suggested approach to achieve stakeholder buy-in>"\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    'localizer': (
+        "You are a cross-cultural prompt localization expert. Adapt the given prompt for "
+        "the target language and cultural context.\n\n"
+        "Do NOT just translate — adapt for:\n"
+        "1. Cultural references and idioms\n"
+        "2. Formal/informal register appropriate to the culture\n"
+        "3. Examples relevant to the target audience\n"
+        "4. Date/number/currency format conventions\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "localized_prompt": "<the adapted prompt in the target language>",\n'
+        '  "adaptations": [\n'
+        '    {"original": "<original element>", "adapted": "<localized element>", "reason": "<why this adaptation>"}\n'
+        "  ],\n"
+        '  "cultural_notes": ["<important cultural considerations>"],\n'
+        '  "back_translation": "<English back-translation of the localized prompt>",\n'
+        '  "confidence": "<high|medium|low>"\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
 }
 
 
@@ -810,6 +997,208 @@ def build_fewshot_prompt(task_description, examples_json, model='gpt-4o-mini'):
         f"Example input/output pairs:\n{examples_json}"
     )
     return execute_prompt(system, user_input, model, temperature=0.3, max_tokens=3072)
+
+
+# --- Phase 4: Knowledge Workflows ---
+
+EXPERT_PERSONAS = {
+    'optimist': ('Optimist Strategist', 'strategic thinker who focuses on opportunities, growth potential, and positive outcomes'),
+    'skeptic': ('Skeptical Analyst', 'critical analyst who questions assumptions, identifies flaws, and stress-tests ideas'),
+    'risk_mgr': ('Risk Manager', 'risk management professional who evaluates threats, vulnerabilities, and mitigation strategies'),
+    'technical': ('Technical Expert', 'technology specialist who assesses feasibility, implementation complexity, and technical trade-offs'),
+    'end_user': ('End-User Advocate', 'user experience champion who evaluates from the customer/end-user perspective'),
+    'financial': ('Financial Advisor', 'financial expert who analyzes costs, ROI, and economic viability'),
+}
+
+
+def execute_expert_panel(topic, personas, model='gpt-4o-mini'):
+    """Run a multi-persona expert panel discussion with moderator synthesis."""
+    total_tokens = 0
+    total_cost = 0.0
+    total_latency = 0
+    expert_responses = []
+
+    # Round 1: Each expert gives their perspective
+    for persona_key in personas:
+        persona = EXPERT_PERSONAS.get(persona_key, (persona_key, 'domain expert'))
+        system = ADVANCED_PROMPTS['expert_panel_persona'].format(
+            persona_name=persona[0], persona_description=persona[1]
+        )
+        result = execute_prompt(system, f"Topic for discussion:\n{topic}", model, temperature=0.6, max_tokens=1024)
+        total_tokens += result.get('tokens_input', 0) + result.get('tokens_output', 0)
+        total_cost += result.get('cost_estimate', 0)
+        total_latency += result.get('latency_ms', 0)
+        expert_responses.append({
+            'persona': persona[0],
+            'persona_key': persona_key,
+            'response': result.get('output', ''),
+        })
+
+    # Round 2: Moderator synthesizes
+    panel_text = "\n\n".join(
+        f"--- {e['persona']} ---\n{e['response']}" for e in expert_responses
+    )
+    moderator_result = execute_prompt(
+        ADVANCED_PROMPTS['expert_panel_moderator'],
+        f"Topic: {topic}\n\nExpert perspectives:\n{panel_text}",
+        model, temperature=0.2, max_tokens=2048
+    )
+    total_tokens += moderator_result.get('tokens_input', 0) + moderator_result.get('tokens_output', 0)
+    total_cost += moderator_result.get('cost_estimate', 0)
+    total_latency += moderator_result.get('latency_ms', 0)
+
+    final_output = json.dumps({
+        'expert_responses': expert_responses,
+        'synthesis': moderator_result.get('output', ''),
+        'num_experts': len(expert_responses),
+    }, indent=2)
+
+    return {
+        'output': final_output,
+        'tokens_input': total_tokens,
+        'tokens_output': 0,
+        'cost_estimate': total_cost,
+        'latency_ms': total_latency,
+        'model': model,
+    }
+
+
+def execute_document_qa(question, documents, model='gpt-4o-mini'):
+    """Answer a question using multiple source documents with citations."""
+    doc_text = "\n\n".join(
+        f"--- Source {i+1}: {doc.get('label', f'Document {i+1}')} ---\n{doc.get('text', '')}"
+        for i, doc in enumerate(documents)
+    )
+    system = ADVANCED_PROMPTS['document_qa']
+    user_input = f"Question: {question}\n\nDocuments:\n{doc_text}"
+    return execute_prompt(system, user_input, model, temperature=0.1, max_tokens=3072)
+
+
+def execute_compliance_check(policy_text, document_text, model='gpt-4o-mini'):
+    """Check a document against a policy/SOP for compliance."""
+    system = ADVANCED_PROMPTS['compliance_checker']
+    user_input = (
+        f"Policy/SOP:\n---\n{policy_text}\n---\n\n"
+        f"Document to check:\n---\n{document_text}\n---"
+    )
+    return execute_prompt(system, user_input, model, temperature=0.1, max_tokens=3072)
+
+
+# --- Phase 5: Specialized Tools ---
+
+def execute_tone_transform(text, target_tone, model='gpt-4o-mini'):
+    """Transform text into a different tone/style."""
+    system = ADVANCED_PROMPTS['tone_transformer']
+    user_input = f"Target tone: {target_tone}\n\nText to transform:\n---\n{text}\n---"
+    return execute_prompt(system, user_input, model, temperature=0.4, max_tokens=2048)
+
+
+def execute_misconception_detector(topic, student_answer, model='gpt-4o-mini'):
+    """Analyze a student answer for misconceptions."""
+    system = ADVANCED_PROMPTS['misconception_detector']
+    user_input = f"Topic/Subject: {topic}\n\nStudent's answer:\n---\n{student_answer}\n---"
+    return execute_prompt(system, user_input, model, temperature=0.2, max_tokens=2048)
+
+
+def execute_cot_visualizer(question, model='gpt-4o-mini'):
+    """Solve a problem with explicit chain-of-thought reasoning steps."""
+    system = ADVANCED_PROMPTS['cot_visualizer']
+    return execute_prompt(system, question, model, temperature=0.3, max_tokens=3072)
+
+
+# --- Phase 6: Extended Features ---
+
+def execute_rag_simulator(query, knowledge_chunks, model='gpt-4o-mini'):
+    """Simulate a RAG pipeline: retrieve relevant chunks then generate answer."""
+    total_tokens = 0
+    total_cost = 0.0
+    total_latency = 0
+
+    # Step 1: Retrieve — rank chunks by relevance
+    chunks_text = "\n\n".join(
+        f"[Chunk {i+1}]: {chunk}" for i, chunk in enumerate(knowledge_chunks)
+    )
+    retrieval_result = execute_prompt(
+        ADVANCED_PROMPTS['rag_retriever'],
+        f"Query: {query}\n\nKnowledge base chunks:\n{chunks_text}",
+        model, temperature=0.1, max_tokens=1024
+    )
+    total_tokens += retrieval_result.get('tokens_input', 0) + retrieval_result.get('tokens_output', 0)
+    total_cost += retrieval_result.get('cost_estimate', 0)
+    total_latency += retrieval_result.get('latency_ms', 0)
+
+    # Parse ranked chunks and select top-K
+    retrieval_output = retrieval_result.get('output', '')
+    top_k = 3
+    selected_chunks = []
+    try:
+        parsed = json.loads(_sanitize_json(retrieval_output))
+        ranked = parsed.get('ranked_chunks', [])
+        for item in ranked[:top_k]:
+            idx = item.get('chunk_index', 1) - 1
+            if 0 <= idx < len(knowledge_chunks):
+                selected_chunks.append((idx + 1, knowledge_chunks[idx]))
+    except (json.JSONDecodeError, TypeError):
+        selected_chunks = [(i + 1, c) for i, c in enumerate(knowledge_chunks[:top_k])]
+
+    # Step 2: Generate with context
+    context = "\n\n".join(f"[Chunk {idx}]: {text}" for idx, text in selected_chunks)
+    gen_with_context = execute_prompt(
+        ADVANCED_PROMPTS['rag_generator'],
+        f"Question: {query}\n\nRetrieved context:\n{context}",
+        model, temperature=0.3, max_tokens=2048
+    )
+    total_tokens += gen_with_context.get('tokens_input', 0) + gen_with_context.get('tokens_output', 0)
+    total_cost += gen_with_context.get('cost_estimate', 0)
+    total_latency += gen_with_context.get('latency_ms', 0)
+
+    # Step 3: Generate without context (baseline)
+    gen_no_context = execute_prompt(
+        "Answer the following question to the best of your knowledge.",
+        query, model, temperature=0.3, max_tokens=1024
+    )
+    total_tokens += gen_no_context.get('tokens_input', 0) + gen_no_context.get('tokens_output', 0)
+    total_cost += gen_no_context.get('cost_estimate', 0)
+    total_latency += gen_no_context.get('latency_ms', 0)
+
+    final_output = json.dumps({
+        'retrieval': retrieval_output,
+        'selected_chunks': [{'chunk_index': idx, 'text': text[:200] + '...' if len(text) > 200 else text} for idx, text in selected_chunks],
+        'answer_with_context': gen_with_context.get('output', ''),
+        'answer_without_context': gen_no_context.get('output', ''),
+        'num_chunks_total': len(knowledge_chunks),
+        'num_chunks_retrieved': len(selected_chunks),
+    }, indent=2)
+
+    return {
+        'output': final_output,
+        'tokens_input': total_tokens,
+        'tokens_output': 0,
+        'cost_estimate': total_cost,
+        'latency_ms': total_latency,
+        'model': model,
+    }
+
+
+def execute_scenario_simulator(plan, stakeholders, model='gpt-4o-mini'):
+    """Simulate stakeholder reactions to a plan or proposal."""
+    system = ADVANCED_PROMPTS['scenario_simulator']
+    stakeholder_list = "\n".join(f"- {s}" for s in stakeholders)
+    user_input = (
+        f"Plan/Proposal:\n---\n{plan}\n---\n\n"
+        f"Stakeholder roles to simulate:\n{stakeholder_list}"
+    )
+    return execute_prompt(system, user_input, model, temperature=0.5, max_tokens=3072)
+
+
+def execute_localizer(prompt_text, target_language, cultural_context='', model='gpt-4o-mini'):
+    """Localize a prompt for a different language and cultural context."""
+    system = ADVANCED_PROMPTS['localizer']
+    user_input = f"Target language: {target_language}\n"
+    if cultural_context:
+        user_input += f"Cultural context notes: {cultural_context}\n"
+    user_input += f"\nPrompt to localize:\n---\n{prompt_text}\n---"
+    return execute_prompt(system, user_input, model, temperature=0.4, max_tokens=3072)
 
 
 def _sanitize_json(text):

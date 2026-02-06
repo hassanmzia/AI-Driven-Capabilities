@@ -19,12 +19,24 @@ import { QualityGatePipeline } from './pages/QualityGatePipeline';
 import { DecompositionWorkflow } from './pages/DecompositionWorkflow';
 import { InjectionTester } from './pages/InjectionTester';
 import { FewShotBuilder } from './pages/FewShotBuilder';
+import { ExpertPanel } from './pages/ExpertPanel';
+import { DocumentQA } from './pages/DocumentQA';
+import { ComplianceChecker } from './pages/ComplianceChecker';
+import { ToneTransformer } from './pages/ToneTransformer';
+import { MisconceptionDetector } from './pages/MisconceptionDetector';
+import { CoTVisualizer } from './pages/CoTVisualizer';
+import { RAGSimulator } from './pages/RAGSimulator';
+import { ScenarioSimulator } from './pages/ScenarioSimulator';
+import { Localizer } from './pages/Localizer';
 
 type PageKey =
   | 'dashboard' | 'feedback' | 'meeting' | 'quiz' | 'slides'
   | 'complaint' | 'custom' | 'templates' | 'history' | 'agents' | 'mcp'
   | 'grader' | 'abtester' | 'schema' | 'selfcorrect' | 'qualitygate'
-  | 'decompose' | 'injection' | 'fewshot';
+  | 'decompose' | 'injection' | 'fewshot'
+  | 'expertpanel' | 'documentqa' | 'compliance'
+  | 'tone' | 'misconception' | 'cot'
+  | 'rag' | 'scenario' | 'localizer';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageKey>('dashboard');
@@ -50,6 +62,15 @@ const App: React.FC = () => {
       case 'decompose': return <DecompositionWorkflow />;
       case 'injection': return <InjectionTester />;
       case 'fewshot': return <FewShotBuilder />;
+      case 'expertpanel': return <ExpertPanel />;
+      case 'documentqa': return <DocumentQA />;
+      case 'compliance': return <ComplianceChecker />;
+      case 'tone': return <ToneTransformer />;
+      case 'misconception': return <MisconceptionDetector />;
+      case 'cot': return <CoTVisualizer />;
+      case 'rag': return <RAGSimulator />;
+      case 'scenario': return <ScenarioSimulator />;
+      case 'localizer': return <Localizer />;
       default: return <Dashboard />;
     }
   };

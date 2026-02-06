@@ -18,6 +18,11 @@ from .serializers import (
     SelfCorrectingRequestSerializer, QualityPipelineRequestSerializer,
     DecompositionRequestSerializer, InjectionTesterRequestSerializer,
     FewShotBuilderRequestSerializer,
+    ExpertPanelRequestSerializer, DocumentQARequestSerializer,
+    ComplianceCheckerRequestSerializer, ToneTransformerRequestSerializer,
+    MisconceptionDetectorRequestSerializer, CoTVisualizerRequestSerializer,
+    RAGSimulatorRequestSerializer, ScenarioSimulatorRequestSerializer,
+    LocalizerRequestSerializer,
 )
 from . import services
 
@@ -410,6 +415,105 @@ def fewshot_builder(request):
         FewShotBuilderRequestSerializer,
         services.build_fewshot_prompt,
         lambda d: {'task_description': d['task_description'], 'examples_json': d['examples'], 'model': d['model']}
+    )
+
+
+# --- Phase 4: Knowledge Workflow Views ---
+
+@api_view(['POST'])
+def expert_panel(request):
+    return _execute_advanced(
+        request, 'expert_panel',
+        ExpertPanelRequestSerializer,
+        services.execute_expert_panel,
+        lambda d: {'topic': d['topic'], 'personas': d['personas'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def document_qa(request):
+    return _execute_advanced(
+        request, 'document_qa',
+        DocumentQARequestSerializer,
+        services.execute_document_qa,
+        lambda d: {'question': d['question'], 'documents': d['documents'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def compliance_checker(request):
+    return _execute_advanced(
+        request, 'compliance_checker',
+        ComplianceCheckerRequestSerializer,
+        services.execute_compliance_check,
+        lambda d: {'policy_text': d['policy_text'], 'document_text': d['document_text'], 'model': d['model']}
+    )
+
+
+# --- Phase 5: Specialized Tool Views ---
+
+@api_view(['POST'])
+def tone_transformer(request):
+    return _execute_advanced(
+        request, 'tone_transformer',
+        ToneTransformerRequestSerializer,
+        services.execute_tone_transform,
+        lambda d: {'text': d['text'], 'target_tone': d['target_tone'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def misconception_detector(request):
+    return _execute_advanced(
+        request, 'misconception_detector',
+        MisconceptionDetectorRequestSerializer,
+        services.execute_misconception_detector,
+        lambda d: {'topic': d['topic'], 'student_answer': d['student_answer'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def cot_visualizer(request):
+    return _execute_advanced(
+        request, 'cot_visualizer',
+        CoTVisualizerRequestSerializer,
+        services.execute_cot_visualizer,
+        lambda d: {'question': d['question'], 'model': d['model']}
+    )
+
+
+# --- Phase 6: Extended Feature Views ---
+
+@api_view(['POST'])
+def rag_simulator(request):
+    return _execute_advanced(
+        request, 'rag_simulator',
+        RAGSimulatorRequestSerializer,
+        services.execute_rag_simulator,
+        lambda d: {'query': d['query'], 'knowledge_chunks': d['knowledge_chunks'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def scenario_simulator(request):
+    return _execute_advanced(
+        request, 'scenario_simulator',
+        ScenarioSimulatorRequestSerializer,
+        services.execute_scenario_simulator,
+        lambda d: {'plan': d['plan'], 'stakeholders': d['stakeholders'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def localizer(request):
+    return _execute_advanced(
+        request, 'localizer',
+        LocalizerRequestSerializer,
+        services.execute_localizer,
+        lambda d: {
+            'prompt_text': d['prompt_text'], 'target_language': d['target_language'],
+            'cultural_context': d['cultural_context'], 'model': d['model']
+        }
     )
 
 

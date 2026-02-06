@@ -142,7 +142,16 @@ export type FeatureCategory =
   | 'quality_pipeline'
   | 'decomposition'
   | 'injection_tester'
-  | 'fewshot_builder';
+  | 'fewshot_builder'
+  | 'expert_panel'
+  | 'document_qa'
+  | 'compliance_checker'
+  | 'tone_transformer'
+  | 'misconception_detector'
+  | 'cot_visualizer'
+  | 'rag_simulator'
+  | 'scenario_simulator'
+  | 'localizer';
 
 export interface CompareResult extends ExecutionResult {
   output_a?: string;

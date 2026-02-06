@@ -32,5 +32,17 @@ urlpatterns = [
     path('execute/decomposition/', views.decomposition, name='decomposition'),
     path('execute/injection-tester/', views.injection_tester, name='injection-tester'),
     path('execute/fewshot-builder/', views.fewshot_builder, name='fewshot-builder'),
+    # Phase 4: Knowledge Workflows
+    path('execute/expert-panel/', views.expert_panel, name='expert-panel'),
+    path('execute/document-qa/', views.document_qa, name='document-qa'),
+    path('execute/compliance-checker/', views.compliance_checker, name='compliance-checker'),
+    # Phase 5: Specialized Tools
+    path('execute/tone-transformer/', views.tone_transformer, name='tone-transformer'),
+    path('execute/misconception-detector/', views.misconception_detector, name='misconception-detector'),
+    path('execute/cot-visualizer/', views.cot_visualizer, name='cot-visualizer'),
+    # Phase 6: Extended Features
+    path('execute/rag-simulator/', views.rag_simulator, name='rag-simulator'),
+    path('execute/scenario-simulator/', views.scenario_simulator, name='scenario-simulator'),
+    path('execute/localizer/', views.localizer, name='localizer'),
     path('health/', views.health_check, name='health-check'),
 ]

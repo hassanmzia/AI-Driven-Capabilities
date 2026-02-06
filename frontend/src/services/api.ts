@@ -113,6 +113,57 @@ export const executeFewShotBuilder = (data: {
 }): Promise<ExecutionResult> =>
   api.post('/api/v1/execute/fewshot-builder/', data).then(r => r.data);
 
+// --- Phase 4: Knowledge Workflow APIs ---
+
+export const executeExpertPanel = (data: {
+  topic: string; personas: string[]; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/expert-panel/', data).then(r => r.data);
+
+export const executeDocumentQA = (data: {
+  question: string; documents: Array<{ label: string; text: string }>; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/document-qa/', data).then(r => r.data);
+
+export const executeComplianceChecker = (data: {
+  policy_text: string; document_text: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/compliance-checker/', data).then(r => r.data);
+
+// --- Phase 5: Specialized Tool APIs ---
+
+export const executeToneTransformer = (data: {
+  text: string; target_tone: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/tone-transformer/', data).then(r => r.data);
+
+export const executeMisconceptionDetector = (data: {
+  topic: string; student_answer: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/misconception-detector/', data).then(r => r.data);
+
+export const executeCoTVisualizer = (data: {
+  question: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/cot-visualizer/', data).then(r => r.data);
+
+// --- Phase 6: Extended Feature APIs ---
+
+export const executeRAGSimulator = (data: {
+  query: string; knowledge_chunks: string[]; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/rag-simulator/', data).then(r => r.data);
+
+export const executeScenarioSimulator = (data: {
+  plan: string; stakeholders: string[]; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/scenario-simulator/', data).then(r => r.data);
+
+export const executeLocalizer = (data: {
+  prompt_text: string; target_language: string; cultural_context?: string; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/execute/localizer/', data).then(r => r.data);
+
 // --- Template APIs ---
 
 export const getTemplates = (params?: Record<string, string>): Promise<{ results: PromptTemplate[] }> =>
