@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getMCPTools, getMCPInfo, executeMCPTool, getAgentCards } from '../services/api';
 import type { MCPTool, AgentCard } from '../types';
+import { FormattedOutput } from '../components/shared/FormattedOutput';
 
 export const MCPExplorer: React.FC = () => {
   const [tab, setTab] = useState<'tools' | 'agents' | 'execute'>('tools');
@@ -150,7 +151,7 @@ export const MCPExplorer: React.FC = () => {
               <div className="card">
                 <div className="card-title" style={{ marginBottom: '1rem' }}>Result</div>
                 {execError && <div className="error-box">{execError}</div>}
-                {execResult && <div className="output-box">{execResult}</div>}
+                {execResult && <div className="output-box"><FormattedOutput text={execResult} /></div>}
                 {!execResult && !execError && (
                   <div className="empty-state">
                     <p>Select a tool and provide arguments to execute</p>

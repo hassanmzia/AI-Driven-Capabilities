@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getExecutions, rateExecution } from '../services/api';
 import type { PromptExecution } from '../types';
+import { FormattedOutput } from '../components/shared/FormattedOutput';
 
 export const ExecutionHistory: React.FC = () => {
   const [executions, setExecutions] = useState<PromptExecution[]>([]);
@@ -107,7 +108,7 @@ export const ExecutionHistory: React.FC = () => {
               </div>
               <div className="form-group">
                 <label className="form-label">Output</label>
-                <div className="output-box">{selectedExec.output_data || 'No output'}</div>
+                <div className="output-box">{selectedExec.output_data ? <FormattedOutput text={selectedExec.output_data} /> : 'No output'}</div>
               </div>
               <div className="meta-row">
                 <div className="meta-item">ID: <strong style={{ fontSize: '0.7rem' }}>{selectedExec.id}</strong></div>
