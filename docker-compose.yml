@@ -1,0 +1,163 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database - Port 5433 (non-default)
+  postgres:
+    image: postgres:16-alpine
+    container_name: pe_postgres
+    environment:
+      POSTGRES_DB: prompt_engineering
+      POSTGRES_USER: pe_admin
+      POSTGRES_PASSWORD: pe_secure_pass_2024
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pe_admin -d prompt_engineering"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pe_network
+
+  # Redis Cache - Port 6380 (non-default)
+  redis:
+    image: redis:7-alpine
+    container_name: pe_redis
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pe_network
+
+  # Django Backend - Port 8070 (non-default)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pe_backend
+    environment:
+      - DATABASE_URL=postgresql://pe_admin:pe_secure_pass_2024@postgres:5432/prompt_engineering
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - DJANGO_SECRET_KEY=pe-secret-key-change-in-production-2024
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - ALLOWED_HOSTS=*
+      - CORS_ALLOWED_ORIGINS=http://172.168.1.95:3070,http://localhost:3070
+      - DEBUG=1
+      - CELERY_BROKER_URL=redis://redis:6379/1
+    ports:
+      - "8070:8000"
+    volumes:
+      - ./backend:/app
+      - backend_static:/app/staticfiles
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             python manage.py seed_templates --noinput || true &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120"
+    networks:
+      - pe_network
+
+  # Celery Worker for async tasks
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pe_celery_worker
+    environment:
+      - DATABASE_URL=postgresql://pe_admin:pe_secure_pass_2024@postgres:5432/prompt_engineering
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - DJANGO_SECRET_KEY=pe-secret-key-change-in-production-2024
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - CELERY_BROKER_URL=redis://redis:6379/1
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A config worker -l info --concurrency=4
+    networks:
+      - pe_network
+
+  # Node.js API Gateway / MCP Orchestrator - Port 4070 (non-default)
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: pe_gateway
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - BACKEND_URL=http://backend:8000
+      - REDIS_URL=redis://redis:6379/2
+      - JWT_SECRET=pe-jwt-secret-change-in-production-2024
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - MCP_AGENT_POOL_SIZE=5
+      - A2A_PROTOCOL_VERSION=1.0
+    ports:
+      - "4070:4000"
+    volumes:
+      - ./gateway/src:/app/src
+    depends_on:
+      - backend
+      - redis
+    networks:
+      - pe_network
+
+  # React Frontend - built and served by Nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=http://172.168.1.95:4070
+        - REACT_APP_WS_URL=ws://172.168.1.95:4070
+    container_name: pe_frontend
+    networks:
+      - pe_network
+
+  # Nginx Reverse Proxy - Port 3070 (main entry point)
+  nginx:
+    image: nginx:alpine
+    container_name: pe_nginx
+    ports:
+      - "3070:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - backend_static:/var/www/static:ro
+    depends_on:
+      - frontend
+      - gateway
+      - backend
+    networks:
+      - pe_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  backend_static:
+
+networks:
+  pe_network:
+    driver: bridge
