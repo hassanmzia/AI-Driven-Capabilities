@@ -615,6 +615,271 @@ ADVANCED_PROMPTS = {
         "}\n"
         "Return ONLY valid JSON."
     ),
+
+    # --- Phase 13: Advanced Reasoning ---
+
+    'self_consistency_voter': (
+        "You are a self-consistency reasoning expert. Given a question or task, generate multiple "
+        "independent reasoning paths and then aggregate the answers to determine the most consistent conclusion.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "reasoning_paths": [\n'
+        '    {"path_id": <n>, "approach": "<description of reasoning approach>", "reasoning": "<full reasoning chain>", "answer": "<conclusion from this path>", "confidence": <0.0-1.0>}\n'
+        "  ],\n"
+        '  "vote_tally": {"<answer>": <count>},\n'
+        '  "majority_answer": "<the most common answer>",\n'
+        '  "agreement_rate": <0.0-1.0>,\n'
+        '  "analysis": "<analysis of agreement/disagreement patterns>",\n'
+        '  "final_answer": "<the final consensus answer with highest confidence>"\n'
+        "}\n"
+        "Generate at least 3 independent reasoning paths using different approaches. Return ONLY valid JSON."
+    ),
+
+    'tree_of_thoughts': (
+        "You are a Tree of Thoughts reasoning expert. Explore multiple reasoning branches for the given "
+        "problem, evaluate each branch, and find the best solution path.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "problem_analysis": "<initial analysis of the problem>",\n'
+        '  "thought_tree": [\n'
+        '    {"node_id": "<id>", "parent_id": "<parent or null for root>", "thought": "<reasoning step>", "evaluation": "<self-evaluation of this thought>", "score": <0.0-1.0>, "status": "<promising|neutral|dead_end>"}\n'
+        "  ],\n"
+        '  "best_path": ["<ordered list of node_ids forming the best solution path>"],\n'
+        '  "solution": "<the final solution following the best path>",\n'
+        '  "alternative_solutions": ["<other viable solutions from different branches>"],\n'
+        '  "pruning_rationale": ["<why certain branches were abandoned>"]\n'
+        "}\n"
+        "Explore at least 3 initial branches with 2-3 depth levels each. Return ONLY valid JSON."
+    ),
+
+    'reflection_loop': (
+        "You are a reflective reasoning expert. After generating an initial response, critically reflect "
+        "on it, identify weaknesses, and produce an improved version.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "initial_response": "<your first attempt at answering>",\n'
+        '  "reflection": {\n'
+        '    "strengths": ["<what was done well>"],\n'
+        '    "weaknesses": ["<what could be improved>"],\n'
+        '    "missing_elements": ["<what was overlooked>"],\n'
+        '    "logical_gaps": ["<any reasoning flaws>"]\n'
+        "  },\n"
+        '  "improved_response": "<the refined response addressing all reflection points>",\n'
+        '  "improvement_summary": "<what changed and why>",\n'
+        '  "confidence_before": <0.0-1.0>,\n'
+        '  "confidence_after": <0.0-1.0>\n'
+        "}\n"
+        "Be genuinely critical in your reflection. Return ONLY valid JSON."
+    ),
+
+    # --- Phase 14: Agent Patterns ---
+
+    'react_agent': (
+        "You are a ReAct (Reasoning + Acting) agent. For the given task, alternate between "
+        "Thought, Action, and Observation steps to solve the problem systematically.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "task_understanding": "<your understanding of the task>",\n'
+        '  "steps": [\n'
+        '    {"step": <n>, "type": "<thought|action|observation>", "content": "<the reasoning, action taken, or observation made>", "tool_used": "<tool name if action, null otherwise>"}\n'
+        "  ],\n"
+        '  "available_tools": ["search", "calculate", "lookup", "analyze", "compare"],\n'
+        '  "final_answer": "<the final answer after all reasoning steps>",\n'
+        '  "tool_usage_summary": {"<tool>": <count>},\n'
+        '  "total_steps": <number>,\n'
+        '  "reasoning_chain_quality": "<assessment of the reasoning chain>"\n'
+        "}\n"
+        "Use the Thought-Action-Observation loop. Return ONLY valid JSON."
+    ),
+
+    'agent_role_designer': (
+        "You are an expert at designing AI agent personas and role specifications. Create a comprehensive "
+        "agent role definition based on the requirements.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "agent_name": "<name for the agent>",\n'
+        '  "role_definition": "<detailed role description>",\n'
+        '  "system_prompt": "<the complete system prompt for this agent>",\n'
+        '  "capabilities": ["<list of specific capabilities>"],\n'
+        '  "constraints": ["<behavioral constraints and boundaries>"],\n'
+        '  "personality_traits": ["<personality characteristics>"],\n'
+        '  "communication_style": "<description of how the agent should communicate>",\n'
+        '  "knowledge_domains": ["<areas of expertise>"],\n'
+        '  "example_interactions": [\n'
+        '    {"user": "<example user message>", "agent": "<example agent response>"}\n'
+        "  ],\n"
+        '  "edge_cases": ["<situations the agent should handle carefully>"],\n'
+        '  "evaluation_criteria": ["<how to measure agent performance>"]\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    'coordinator_router': (
+        "You are an intelligent task routing coordinator. Analyze the incoming task and determine "
+        "the optimal routing strategy across available specialist agents.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "task_analysis": {\n'
+        '    "complexity": "<simple|moderate|complex>",\n'
+        '    "domain": "<primary domain>",\n'
+        '    "sub_domains": ["<additional domains involved>"],\n'
+        '    "requires_coordination": <true/false>\n'
+        "  },\n"
+        '  "routing_plan": [\n'
+        '    {"step": <n>, "agent": "<agent name>", "task": "<specific sub-task>", "dependencies": [<step numbers>], "priority": "<high|medium|low>"}\n'
+        "  ],\n"
+        '  "execution_strategy": "<sequential|parallel|hybrid>",\n'
+        '  "estimated_steps": <number>,\n'
+        '  "fallback_plan": "<what to do if primary routing fails>",\n'
+        '  "coordination_notes": ["<important coordination considerations>"]\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    # --- Phase 15: Auto-Optimization ---
+
+    'ape_studio': (
+        "You are an Automatic Prompt Engineering (APE) expert. Given a task description and optional "
+        "examples, automatically generate multiple candidate prompts and evaluate them.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "task_analysis": "<analysis of what the task requires>",\n'
+        '  "candidate_prompts": [\n'
+        '    {"id": <n>, "prompt": "<the candidate prompt>", "strategy": "<what PE technique this uses>", "estimated_quality": <1-10>, "rationale": "<why this approach>"}\n'
+        "  ],\n"
+        '  "best_prompt": "<the highest-rated candidate prompt>",\n'
+        '  "optimization_notes": ["<insights about what makes a good prompt for this task>"],\n'
+        '  "technique_breakdown": {"<technique>": "<how it was applied>"}\n'
+        "}\n"
+        "Generate at least 5 diverse candidate prompts using different techniques. Return ONLY valid JSON."
+    ),
+
+    'prompt_evolution': (
+        "You are a prompt evolution specialist. Given an initial prompt and performance feedback, "
+        "evolve the prompt through multiple generations to improve it.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "original_prompt": "<the starting prompt>",\n'
+        '  "generations": [\n'
+        '    {"generation": <n>, "prompt": "<evolved prompt>", "mutations": ["<what changed>"], "fitness_score": <1-10>, "reasoning": "<why these changes>"}\n'
+        "  ],\n"
+        '  "best_generation": <generation number>,\n'
+        '  "best_prompt": "<the highest fitness prompt>",\n'
+        '  "evolution_log": ["<key insights from the evolution process>"],\n'
+        '  "convergence_analysis": "<did the evolution converge? what patterns emerged?>"'
+        "\n}\n"
+        "Run at least 4 generations of evolution. Return ONLY valid JSON."
+    ),
+
+    'meta_prompt_designer': (
+        "You are a meta-prompt engineering expert. Design a prompt that generates other prompts "
+        "for a given domain or task type.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "meta_prompt": "<the meta-prompt that can generate task-specific prompts>",\n'
+        '  "template_variables": [\n'
+        '    {"name": "<variable name>", "description": "<what to fill in>", "example": "<example value>"}\n'
+        "  ],\n"
+        '  "example_outputs": [\n'
+        '    {"variables": {"<var>": "<value>"}, "generated_prompt": "<what the meta-prompt would produce>"}\n'
+        "  ],\n"
+        '  "design_principles": ["<principles used in the meta-prompt design>"],\n'
+        '  "use_cases": ["<scenarios where this meta-prompt is useful>"],\n'
+        '  "customization_guide": "<how to adapt the meta-prompt for different needs>"\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    # --- Phase 16: Safety & Verification ---
+
+    'guardrail_builder': (
+        "You are a prompt safety and guardrail engineering expert. Design comprehensive guardrails "
+        "for the given AI system or prompt.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "system_analysis": "<analysis of potential risks for this system>",\n'
+        '  "guardrails": [\n'
+        '    {"id": <n>, "category": "<content_safety|bias|hallucination|privacy|misuse|scope>", "rule": "<the guardrail rule>", "implementation": "<how to implement in prompt>", "severity": "<critical|high|medium|low>", "example_trigger": "<input that would trigger this guardrail>"}\n'
+        "  ],\n"
+        '  "hardened_prompt": "<the original prompt with all guardrails integrated>",\n'
+        '  "test_cases": [\n'
+        '    {"test": "<adversarial input>", "expected_behavior": "<how system should respond>", "guardrail_id": <n>}\n'
+        "  ],\n"
+        '  "coverage_score": <0-100>,\n'
+        '  "remaining_risks": ["<risks that guardrails cannot fully mitigate>"]\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    'self_verification_chain': (
+        "You are a self-verification expert. For the given task, generate a response and then "
+        "create and run verification checks to validate correctness.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "initial_response": "<the generated response>",\n'
+        '  "verification_checks": [\n'
+        '    {"check_id": <n>, "check_type": "<factual|logical|completeness|consistency|format>", "description": "<what is being verified>", "result": "<pass|fail|warning>", "evidence": "<evidence for the result>", "confidence": <0.0-1.0>}\n'
+        "  ],\n"
+        '  "overall_verification": "<verified|partially_verified|unverified>",\n'
+        '  "trust_score": <0.0-1.0>,\n'
+        '  "corrections_needed": ["<any corrections identified>"],\n'
+        '  "verified_response": "<the final response after applying any corrections>"\n'
+        "}\n"
+        "Be thorough in verification. Return ONLY valid JSON."
+    ),
+
+    # --- Phase 17: Context & Memory ---
+
+    'context_packer': (
+        "You are a context window optimization expert. Given content that needs to fit within "
+        "a token budget, optimize it for maximum information density.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "original_analysis": {\n'
+        '    "estimated_tokens": <number>,\n'
+        '    "key_information_units": <number>,\n'
+        '    "redundancy_score": <0.0-1.0>\n'
+        "  },\n"
+        '  "optimized_content": "<the compressed/optimized content>",\n'
+        '  "optimization_techniques": [\n'
+        '    {"technique": "<technique used>", "tokens_saved": <estimated>, "information_preserved": "<high|medium|low>"}\n'
+        "  ],\n"
+        '  "optimized_analysis": {\n'
+        '    "estimated_tokens": <number>,\n'
+        '    "compression_ratio": <0.0-1.0>,\n'
+        '    "information_retention": <0.0-1.0>\n'
+        "  },\n"
+        '  "priority_ranking": ["<information units ranked by importance>"],\n'
+        '  "recommendations": ["<further optimization suggestions>"]\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
+
+    'memory_aware_prompting': (
+        "You are a memory-aware prompt engineering expert. Design a prompt strategy that effectively "
+        "manages conversation context, memory, and state across interactions.\n\n"
+        "Return a JSON object:\n"
+        "{\n"
+        '  "memory_strategy": {\n'
+        '    "type": "<sliding_window|summarization|hierarchical|hybrid>",\n'
+        '    "description": "<detailed description of the strategy>",\n'
+        '    "max_context_tokens": <recommended budget>,\n'
+        '    "memory_update_frequency": "<when to update memory>"\n'
+        "  },\n"
+        '  "prompt_template": "<the memory-aware prompt template with placeholders>",\n'
+        '  "memory_schema": {\n'
+        '    "short_term": ["<what to keep in recent context>"],\n'
+        '    "long_term": ["<what to persist across sessions>"],\n'
+        '    "working": ["<what to maintain for current task>"]\n'
+        "  },\n"
+        '  "example_flow": [\n'
+        '    {"turn": <n>, "user_input": "<example>", "memory_state": "<what is remembered>", "context_sent": "<what context is included in prompt>"}\n'
+        "  ],\n"
+        '  "optimization_tips": ["<tips for managing memory efficiently>"],\n'
+        '  "implementation_notes": "<how to implement this in production>"\n'
+        "}\n"
+        "Return ONLY valid JSON."
+    ),
 }
 
 
@@ -1199,6 +1464,183 @@ def execute_localizer(prompt_text, target_language, cultural_context='', model='
         user_input += f"Cultural context notes: {cultural_context}\n"
     user_input += f"\nPrompt to localize:\n---\n{prompt_text}\n---"
     return execute_prompt(system, user_input, model, temperature=0.4, max_tokens=3072)
+
+
+# --- Phase 13: Advanced Reasoning ---
+
+def execute_self_consistency(question, num_paths=5, model='gpt-4o-mini'):
+    """Generate multiple reasoning paths and vote on the most consistent answer."""
+    system = ADVANCED_PROMPTS['self_consistency_voter']
+    user_input = (
+        f"Question/Task:\n{question}\n\n"
+        f"Generate {num_paths} independent reasoning paths and determine the consensus answer."
+    )
+    return execute_prompt(system, user_input, model, temperature=0.7, max_tokens=4096)
+
+
+def execute_tree_of_thoughts(problem, num_branches=3, max_depth=3, model='gpt-4o-mini'):
+    """Explore multiple reasoning branches in a tree structure."""
+    system = ADVANCED_PROMPTS['tree_of_thoughts']
+    user_input = (
+        f"Problem to solve:\n{problem}\n\n"
+        f"Explore {num_branches} initial branches with up to {max_depth} depth levels each."
+    )
+    return execute_prompt(system, user_input, model, temperature=0.6, max_tokens=4096)
+
+
+def execute_reflection_loop(task, input_text, num_rounds=2, model='gpt-4o-mini'):
+    """Generate, reflect, and improve through multiple rounds."""
+    total_tokens = 0
+    total_cost = 0.0
+    total_latency = 0
+    rounds = []
+
+    system = ADVANCED_PROMPTS['reflection_loop']
+    current_task = f"Task: {task}\n\nInput:\n{input_text}"
+
+    for i in range(num_rounds):
+        if i > 0:
+            current_task = (
+                f"Task: {task}\n\nInput:\n{input_text}\n\n"
+                f"Previous attempt:\n{rounds[-1].get('output', '')}\n\n"
+                f"This is reflection round {i+1}. Build on the previous attempt and improve further."
+            )
+
+        result = execute_prompt(system, current_task, model, temperature=0.4, max_tokens=3072)
+        total_tokens += result.get('tokens_input', 0) + result.get('tokens_output', 0)
+        total_cost += result.get('cost_estimate', 0)
+        total_latency += result.get('latency_ms', 0)
+        rounds.append({
+            'round': i + 1,
+            'output': result.get('output', ''),
+        })
+
+    final_output = json.dumps({
+        'rounds': rounds,
+        'total_rounds': len(rounds),
+        'final_output': rounds[-1].get('output', '') if rounds else '',
+    }, indent=2)
+
+    return {
+        'output': final_output,
+        'tokens_input': total_tokens,
+        'tokens_output': 0,
+        'cost_estimate': total_cost,
+        'latency_ms': total_latency,
+        'model': model,
+    }
+
+
+# --- Phase 14: Agent Patterns ---
+
+def execute_react_agent(task, available_tools=None, model='gpt-4o-mini'):
+    """Simulate a ReAct agent with Thought-Action-Observation loops."""
+    system = ADVANCED_PROMPTS['react_agent']
+    tools_str = ', '.join(available_tools) if available_tools else 'search, calculate, lookup, analyze, compare'
+    user_input = (
+        f"Task: {task}\n\n"
+        f"Available tools: {tools_str}\n\n"
+        f"Solve this task using the ReAct (Thought-Action-Observation) framework."
+    )
+    return execute_prompt(system, user_input, model, temperature=0.5, max_tokens=4096)
+
+
+def execute_agent_role_designer(role_description, domain='', constraints='', model='gpt-4o-mini'):
+    """Design a comprehensive AI agent role specification."""
+    system = ADVANCED_PROMPTS['agent_role_designer']
+    user_input = f"Design an AI agent with the following requirements:\n\n{role_description}"
+    if domain:
+        user_input += f"\n\nDomain: {domain}"
+    if constraints:
+        user_input += f"\n\nConstraints: {constraints}"
+    return execute_prompt(system, user_input, model, temperature=0.5, max_tokens=4096)
+
+
+def execute_coordinator_router(task, agents=None, model='gpt-4o-mini'):
+    """Route a complex task across multiple specialist agents."""
+    system = ADVANCED_PROMPTS['coordinator_router']
+    agents_str = '\n'.join(f"- {a}" for a in agents) if agents else '- Researcher\n- Writer\n- Reviewer\n- Analyst'
+    user_input = (
+        f"Task to route:\n{task}\n\n"
+        f"Available specialist agents:\n{agents_str}"
+    )
+    return execute_prompt(system, user_input, model, temperature=0.3, max_tokens=3072)
+
+
+# --- Phase 15: Auto-Optimization ---
+
+def execute_ape_studio(task_description, examples='', model='gpt-4o-mini'):
+    """Automatically generate and evaluate candidate prompts for a task."""
+    system = ADVANCED_PROMPTS['ape_studio']
+    user_input = f"Task description:\n{task_description}"
+    if examples:
+        user_input += f"\n\nExample inputs/outputs:\n{examples}"
+    return execute_prompt(system, user_input, model, temperature=0.7, max_tokens=4096)
+
+
+def execute_prompt_evolution(initial_prompt, feedback='', num_generations=4, model='gpt-4o-mini'):
+    """Evolve a prompt through multiple generations based on feedback."""
+    system = ADVANCED_PROMPTS['prompt_evolution']
+    user_input = (
+        f"Initial prompt to evolve:\n---\n{initial_prompt}\n---\n\n"
+        f"Run {num_generations} generations of evolution."
+    )
+    if feedback:
+        user_input += f"\n\nPerformance feedback on the initial prompt:\n{feedback}"
+    return execute_prompt(system, user_input, model, temperature=0.6, max_tokens=4096)
+
+
+def execute_meta_prompt(domain, task_type='', requirements='', model='gpt-4o-mini'):
+    """Design a meta-prompt that generates task-specific prompts."""
+    system = ADVANCED_PROMPTS['meta_prompt_designer']
+    user_input = f"Domain: {domain}"
+    if task_type:
+        user_input += f"\nTask type: {task_type}"
+    if requirements:
+        user_input += f"\nRequirements:\n{requirements}"
+    return execute_prompt(system, user_input, model, temperature=0.5, max_tokens=4096)
+
+
+# --- Phase 16: Safety & Verification ---
+
+def execute_guardrail_builder(system_prompt, use_case='', risk_level='medium', model='gpt-4o-mini'):
+    """Design comprehensive guardrails for an AI system."""
+    system = ADVANCED_PROMPTS['guardrail_builder']
+    user_input = f"System/Prompt to protect:\n---\n{system_prompt}\n---"
+    if use_case:
+        user_input += f"\n\nUse case: {use_case}"
+    user_input += f"\n\nRisk tolerance level: {risk_level}"
+    return execute_prompt(system, user_input, model, temperature=0.3, max_tokens=4096)
+
+
+def execute_self_verification(task, input_text, model='gpt-4o-mini'):
+    """Generate a response and verify it with multiple checks."""
+    system = ADVANCED_PROMPTS['self_verification_chain']
+    user_input = f"Task: {task}\n\nInput:\n{input_text}"
+    return execute_prompt(system, user_input, model, temperature=0.3, max_tokens=4096)
+
+
+# --- Phase 17: Context & Memory ---
+
+def execute_context_packer(content, token_budget=4000, model='gpt-4o-mini'):
+    """Optimize content for maximum information density within token budget."""
+    system = ADVANCED_PROMPTS['context_packer']
+    user_input = (
+        f"Token budget: {token_budget}\n\n"
+        f"Content to optimize:\n---\n{content}\n---"
+    )
+    return execute_prompt(system, user_input, model, temperature=0.2, max_tokens=4096)
+
+
+def execute_memory_aware_prompting(task_description, conversation_type='', context_requirements='', model='gpt-4o-mini'):
+    """Design a memory-aware prompting strategy for multi-turn conversations."""
+    system = ADVANCED_PROMPTS['memory_aware_prompting']
+    user_input = f"Task/Application:\n{task_description}"
+    if conversation_type:
+        user_input += f"\n\nConversation type: {conversation_type}"
+    if context_requirements:
+        user_input += f"\n\nContext requirements:\n{context_requirements}"
+    return execute_prompt(system, user_input, model, temperature=0.4, max_tokens=4096)
 
 
 def _sanitize_json(text):

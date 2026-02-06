@@ -23,6 +23,13 @@ from .serializers import (
     MisconceptionDetectorRequestSerializer, CoTVisualizerRequestSerializer,
     RAGSimulatorRequestSerializer, ScenarioSimulatorRequestSerializer,
     LocalizerRequestSerializer,
+    SelfConsistencyRequestSerializer, TreeOfThoughtsRequestSerializer,
+    ReflectionLoopRequestSerializer, ReActAgentRequestSerializer,
+    AgentRoleDesignerRequestSerializer, CoordinatorRouterRequestSerializer,
+    APEStudioRequestSerializer, PromptEvolutionRequestSerializer,
+    MetaPromptRequestSerializer, GuardrailBuilderRequestSerializer,
+    SelfVerificationRequestSerializer, ContextPackerRequestSerializer,
+    MemoryAwareRequestSerializer,
 )
 from . import services
 
@@ -514,6 +521,146 @@ def localizer(request):
             'prompt_text': d['prompt_text'], 'target_language': d['target_language'],
             'cultural_context': d['cultural_context'], 'model': d['model']
         }
+    )
+
+
+# --- Phase 13: Advanced Reasoning Views ---
+
+@api_view(['POST'])
+def self_consistency(request):
+    return _execute_advanced(
+        request, 'self_consistency',
+        SelfConsistencyRequestSerializer,
+        services.execute_self_consistency,
+        lambda d: {'question': d['question'], 'num_paths': d['num_paths'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def tree_of_thoughts(request):
+    return _execute_advanced(
+        request, 'tree_of_thoughts',
+        TreeOfThoughtsRequestSerializer,
+        services.execute_tree_of_thoughts,
+        lambda d: {'problem': d['problem'], 'num_branches': d['num_branches'], 'max_depth': d['max_depth'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def reflection_loop(request):
+    return _execute_advanced(
+        request, 'reflection_loop',
+        ReflectionLoopRequestSerializer,
+        services.execute_reflection_loop,
+        lambda d: {'task': d['task'], 'input_text': d['input_text'], 'num_rounds': d['num_rounds'], 'model': d['model']}
+    )
+
+
+# --- Phase 14: Agent Pattern Views ---
+
+@api_view(['POST'])
+def react_agent(request):
+    return _execute_advanced(
+        request, 'react_agent',
+        ReActAgentRequestSerializer,
+        services.execute_react_agent,
+        lambda d: {'task': d['task'], 'available_tools': d.get('available_tools', []), 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def agent_role_designer(request):
+    return _execute_advanced(
+        request, 'agent_role_designer',
+        AgentRoleDesignerRequestSerializer,
+        services.execute_agent_role_designer,
+        lambda d: {'role_description': d['role_description'], 'domain': d['domain'], 'constraints': d['constraints'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def coordinator_router(request):
+    return _execute_advanced(
+        request, 'coordinator_router',
+        CoordinatorRouterRequestSerializer,
+        services.execute_coordinator_router,
+        lambda d: {'task': d['task'], 'agents': d.get('agents', []), 'model': d['model']}
+    )
+
+
+# --- Phase 15: Auto-Optimization Views ---
+
+@api_view(['POST'])
+def ape_studio(request):
+    return _execute_advanced(
+        request, 'ape_studio',
+        APEStudioRequestSerializer,
+        services.execute_ape_studio,
+        lambda d: {'task_description': d['task_description'], 'examples': d['examples'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def prompt_evolution(request):
+    return _execute_advanced(
+        request, 'prompt_evolution',
+        PromptEvolutionRequestSerializer,
+        services.execute_prompt_evolution,
+        lambda d: {'initial_prompt': d['initial_prompt'], 'feedback': d['feedback'], 'num_generations': d['num_generations'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def meta_prompt(request):
+    return _execute_advanced(
+        request, 'meta_prompt',
+        MetaPromptRequestSerializer,
+        services.execute_meta_prompt,
+        lambda d: {'domain': d['domain'], 'task_type': d['task_type'], 'requirements': d['requirements'], 'model': d['model']}
+    )
+
+
+# --- Phase 16: Safety & Verification Views ---
+
+@api_view(['POST'])
+def guardrail_builder(request):
+    return _execute_advanced(
+        request, 'guardrail_builder',
+        GuardrailBuilderRequestSerializer,
+        services.execute_guardrail_builder,
+        lambda d: {'system_prompt': d['system_prompt'], 'use_case': d['use_case'], 'risk_level': d['risk_level'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def self_verification(request):
+    return _execute_advanced(
+        request, 'self_verification',
+        SelfVerificationRequestSerializer,
+        services.execute_self_verification,
+        lambda d: {'task': d['task'], 'input_text': d['input_text'], 'model': d['model']}
+    )
+
+
+# --- Phase 17: Context & Memory Views ---
+
+@api_view(['POST'])
+def context_packer(request):
+    return _execute_advanced(
+        request, 'context_packer',
+        ContextPackerRequestSerializer,
+        services.execute_context_packer,
+        lambda d: {'content': d['content'], 'token_budget': d['token_budget'], 'model': d['model']}
+    )
+
+
+@api_view(['POST'])
+def memory_aware(request):
+    return _execute_advanced(
+        request, 'memory_aware',
+        MemoryAwareRequestSerializer,
+        services.execute_memory_aware_prompting,
+        lambda d: {'task_description': d['task_description'], 'conversation_type': d['conversation_type'], 'context_requirements': d['context_requirements'], 'model': d['model']}
     )
 
 
