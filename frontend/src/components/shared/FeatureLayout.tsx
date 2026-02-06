@@ -9,10 +9,11 @@ interface FeatureLayoutProps {
   result: ExecutionResult | null;
   loading: boolean;
   error: string | null;
+  extraActions?: React.ReactNode;
 }
 
 export const FeatureLayout: React.FC<FeatureLayoutProps> = ({
-  title, description, children, result, loading, error,
+  title, description, children, result, loading, error, extraActions,
 }) => {
   const [showRaw, setShowRaw] = useState(false);
 
@@ -38,9 +39,12 @@ export const FeatureLayout: React.FC<FeatureLayoutProps> = ({
             <div className="card-header">
               <div className="card-title">Output</div>
               {result && (
-                <button className="btn btn-secondary btn-sm" onClick={() => setShowRaw(!showRaw)}>
-                  {showRaw ? 'Formatted' : 'Raw'}
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {extraActions}
+                  <button className="btn btn-secondary btn-sm" onClick={() => setShowRaw(!showRaw)}>
+                    {showRaw ? 'Formatted' : 'Raw'}
+                  </button>
+                </div>
               )}
             </div>
 

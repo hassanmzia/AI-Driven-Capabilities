@@ -1,4 +1,5 @@
 import logging
+from django.http import FileResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
@@ -185,6 +186,33 @@ def custom_prompt(request):
             'max_tokens': d['max_tokens'],
         }
     )
+
+
+@api_view(['POST'])
+def export_slides_pptx(request):
+    """Export a slide script execution to a PowerPoint file."""
+    execution_id = request.data.get('execution_id')
+    slide_json = request.data.get('slide_json')
+
+    # Get slide JSON from execution record or direct input
+    if execution_id:
+        try:
+            execution = PromptExecution.objects.get(id=execution_id)
+            slide_json = execution.output_data
+        except PromptExecution.DoesNotExist:
+            return Response({'error': 'Execution not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not slide_json:
+        return Response({'error': 'No slide data provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        buf = services.generate_pptx(slide_json)
+        response = FileResponse(buf, content_type='application/vnd.openxmlformats-officedocument.presentationml.presentation')
+        response['Content-Disposition'] = 'attachment; filename="presentation.pptx"'
+        return response
+    except Exception as e:
+        logger.error(f"PPTX generation failed: {e}")
+        return Response({'error': f'Failed to generate PowerPoint: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
