@@ -587,6 +587,53 @@ body {
     grid-template-columns: 1fr !important;
   }
 
+  /* Force fixed-width sidebar layouts (e.g. 300px 1fr) to stack on mobile */
+  .main-content [style*="px 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Constrain max-height on scrollable panels for mobile */
+  .main-content [style*="calc(100vh"] {
+    max-height: none !important;
+  }
+
+  /* Override max-height: 80vh panels on mobile */
+  .main-content [style*="80vh"] {
+    max-height: none !important;
+  }
+
+  /* Force fixed flex-basis items to be full-width on mobile */
+  .main-content [style*="flex: 0 0"] {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Ensure flex containers wrap on mobile */
+  .main-content [style*="display: flex"] {
+    flex-wrap: wrap !important;
+  }
+
+  /* Make tables scrollable on mobile */
+  .main-content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.8rem;
+  }
+
+  .main-content thead,
+  .main-content tbody {
+    display: table;
+    width: 100%;
+  }
+
+  .main-content th,
+  .main-content td {
+    padding: 0.5rem !important;
+    white-space: nowrap;
+    font-size: 0.78rem;
+  }
+
   .sidebar {
     position: fixed;
     left: 0;
