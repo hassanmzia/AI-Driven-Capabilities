@@ -1,0 +1,22 @@
+{
+  "name": "pe-gateway",
+  "version": "1.0.0",
+  "description": "API Gateway with MCP orchestration and A2A protocol for Prompt Engineering Platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "cors": "^2.8.5",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "axios": "^1.7.9",
+    "ioredis": "^5.4.2",
+    "uuid": "^11.0.3",
+    "ws": "^8.18.0",
+    "express-rate-limit": "^7.4.1",
+    "compression": "^1.7.5"
+  }
+}

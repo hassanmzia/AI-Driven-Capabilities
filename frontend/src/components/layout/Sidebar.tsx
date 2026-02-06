@@ -1,0 +1,76 @@
+import React from 'react';
+
+interface SidebarProps {
+  currentPage: string;
+  onNavigate: (page: string) => void;
+}
+
+interface NavItem {
+  key: string;
+  label: string;
+  icon: string;
+}
+
+const featureItems: NavItem[] = [
+  { key: 'feedback', label: 'Feedback Analysis', icon: '💬' },
+  { key: 'meeting', label: 'Meeting Summarizer', icon: '📝' },
+  { key: 'quiz', label: 'Quiz Generator', icon: '📋' },
+  { key: 'slides', label: 'Slide Scripts', icon: '📊' },
+  { key: 'complaint', label: 'Complaint Response', icon: '🎧' },
+  { key: 'custom', label: 'Custom Prompt', icon: '⚡' },
+];
+
+const systemItems: NavItem[] = [
+  { key: 'templates', label: 'Template Library', icon: '📚' },
+  { key: 'agents', label: 'Multi-Agent', icon: '🤖' },
+  { key: 'mcp', label: 'MCP Explorer', icon: '🔌' },
+  { key: 'history', label: 'Execution History', icon: '📜' },
+];
+
+export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate }) => {
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-logo">
+        <h1>PromptForge</h1>
+        <p>AI Prompt Engineering Platform</p>
+      </div>
+
+      <nav>
+        <div className="nav-section">
+          <button
+            className={`nav-item ${currentPage === 'dashboard' ? 'active' : ''}`}
+            onClick={() => onNavigate('dashboard')}
+          >
+            <span>📈</span> Dashboard
+          </button>
+        </div>
+
+        <div className="nav-section">
+          <div className="nav-section-title">Prompt Features</div>
+          {featureItems.map((item) => (
+            <button
+              key={item.key}
+              className={`nav-item ${currentPage === item.key ? 'active' : ''}`}
+              onClick={() => onNavigate(item.key)}
+            >
+              <span>{item.icon}</span> {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="nav-section">
+          <div className="nav-section-title">System</div>
+          {systemItems.map((item) => (
+            <button
+              key={item.key}
+              className={`nav-item ${currentPage === item.key ? 'active' : ''}`}
+              onClick={() => onNavigate(item.key)}
+            >
+              <span>{item.icon}</span> {item.label}
+            </button>
+          ))}
+        </div>
+      </nav>
+    </aside>
+  );
+};
