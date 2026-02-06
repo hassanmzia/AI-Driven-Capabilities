@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { ExecutionResult } from '../../types';
+import { FormattedOutput } from './FormattedOutput';
 
 interface FeatureLayoutProps {
   title: string;
@@ -55,7 +56,7 @@ export const FeatureLayout: React.FC<FeatureLayoutProps> = ({
             {result && !loading && (
               <>
                 <div className="output-box">
-                  {showRaw ? JSON.stringify(result, null, 2) : result.output}
+                  {showRaw ? JSON.stringify(result, null, 2) : <FormattedOutput text={result.output} />}
                 </div>
                 <div className="meta-row">
                   <div className="meta-item">Model: <strong>{result.model}</strong></div>

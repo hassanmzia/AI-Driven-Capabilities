@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { runMultiAgentWorkflow } from '../services/api';
+import { FormattedOutput } from '../components/shared/FormattedOutput';
 
 interface WorkflowResult {
   workflow_id: string;
@@ -131,7 +132,7 @@ export const MultiAgentWorkflow: React.FC = () => {
                     </div>
                     {isExpanded && (
                       <div className="output-box" style={{ marginTop: '0.5rem' }}>
-                        {r.output}
+                        <FormattedOutput text={r.output} />
                       </div>
                     )}
                   </div>
