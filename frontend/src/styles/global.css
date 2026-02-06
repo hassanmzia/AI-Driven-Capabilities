@@ -587,6 +587,16 @@ body {
     grid-template-columns: 1fr !important;
   }
 
+  /* Force fixed-width sidebar layouts (e.g. 300px 1fr) to stack on mobile */
+  .main-content [style*="px 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Constrain max-height on scrollable panels for mobile */
+  .main-content [style*="calc(100vh"] {
+    max-height: none !important;
+  }
+
   .sidebar {
     position: fixed;
     left: 0;
