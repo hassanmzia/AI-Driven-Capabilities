@@ -204,45 +204,64 @@ function TextOutput({ text }: { text: string }): React.ReactElement {
   return <div>{elements}</div>;
 }
 
+function sanitizeJSON(str: string): string {
+  // Fix unquoted NULL, TRUE, FALSE that LLMs often produce
+  return str
+    .replace(/:\s*NULL\b/gi, ': null')
+    .replace(/:\s*TRUE\b/gi, ': true')
+    .replace(/:\s*FALSE\b/gi, ': false')
+    .replace(/,\s*([}\]])/g, '$1'); // remove trailing commas
+}
+
+function tryParse(str: string): any | null {
+  try {
+    return JSON.parse(str);
+  } catch {
+    try {
+      return JSON.parse(sanitizeJSON(str));
+    } catch {
+      return null;
+    }
+  }
+}
+
 function extractJSON(text: string): { parsed: any; before: string; after: string } | null {
   const trimmed = text.trim();
 
   // Direct JSON
   if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
       (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
-    try {
-      return { parsed: JSON.parse(trimmed), before: '', after: '' };
-    } catch { /* fall through */ }
+    const parsed = tryParse(trimmed);
+    if (parsed !== null) return { parsed, before: '', after: '' };
   }
 
   // JSON inside markdown code blocks: ```json\n...\n``` or ```\n...\n```
   const codeBlockRegex = /```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/;
   const cbMatch = trimmed.match(codeBlockRegex);
   if (cbMatch) {
-    const jsonStr = cbMatch[1].trim();
-    try {
-      const parsed = JSON.parse(jsonStr);
+    const parsed = tryParse(cbMatch[1].trim());
+    if (parsed !== null) {
       const idx = trimmed.indexOf(cbMatch[0]);
       const before = trimmed.slice(0, idx).trim();
       const after = trimmed.slice(idx + cbMatch[0].length).trim();
       return { parsed, before, after };
-    } catch { /* fall through */ }
+    }
   }
 
   // JSON embedded in text — find first { or [ and match to last } or ]
   const firstBrace = trimmed.search(/[{[]/);
-  if (firstBrace > 0) {
+  if (firstBrace >= 0) {
     const opener = trimmed[firstBrace];
     const closer = opener === '{' ? '}' : ']';
     const lastClose = trimmed.lastIndexOf(closer);
     if (lastClose > firstBrace) {
       const candidate = trimmed.slice(firstBrace, lastClose + 1);
-      try {
-        const parsed = JSON.parse(candidate);
+      const parsed = tryParse(candidate);
+      if (parsed !== null) {
         const before = trimmed.slice(0, firstBrace).trim();
         const after = trimmed.slice(lastClose + 1).trim();
         return { parsed, before, after };
-      } catch { /* fall through */ }
+      }
     }
   }
 
