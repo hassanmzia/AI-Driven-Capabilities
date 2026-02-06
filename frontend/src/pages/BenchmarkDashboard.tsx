@@ -63,11 +63,11 @@ export function BenchmarkDashboard() {
             month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit',
           }),
           model: r.model,
-          passRate: r.pass_rate,
-          avgScore: r.avg_score,
-          tokens: r.total_tokens,
-          cost: r.total_cost,
-          latency: r.total_latency_ms,
+          passRate: Number(r.pass_rate) || 0,
+          avgScore: Number(r.avg_score) || 0,
+          tokens: Number(r.total_tokens) || 0,
+          cost: Number(r.total_cost) || 0,
+          latency: Number(r.total_latency_ms) || 0,
           isBest: false,
         }));
 

@@ -323,7 +323,7 @@ export const ChallengePlayground: React.FC = () => {
                     <div className="meta-row">
                       <div className="meta-item">Model: <strong>{result.model}</strong></div>
                       <div className="meta-item">Tokens: <strong>{result.tokens_input}</strong></div>
-                      <div className="meta-item">Cost: <strong>${result.cost_estimate.toFixed(5)}</strong></div>
+                      <div className="meta-item">Cost: <strong>${Number(result.cost_estimate).toFixed(5)}</strong></div>
                       <div className="meta-item">Latency: <strong>{result.latency_ms}ms</strong></div>
                     </div>
                   </div>

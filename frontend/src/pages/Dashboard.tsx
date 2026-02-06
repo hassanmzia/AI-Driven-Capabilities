@@ -47,15 +47,15 @@ export const Dashboard: React.FC = () => {
               <div className="stat-label">Total Tokens</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">${(stats?.total_cost ?? 0).toFixed(4)}</div>
+              <div className="stat-value">${Number(stats?.total_cost ?? 0).toFixed(4)}</div>
               <div className="stat-label">Total Cost</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">{stats?.avg_latency_ms ?? 0}ms</div>
+              <div className="stat-value">{Number(stats?.avg_latency_ms ?? 0).toFixed(0)}ms</div>
               <div className="stat-label">Avg Latency</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">{stats?.avg_rating ? `${stats.avg_rating}/5` : 'N/A'}</div>
+              <div className="stat-value">{`${Number(stats?.avg_rating ?? 0).toFixed(1)}/5`}</div>
               <div className="stat-label">Avg Rating</div>
             </div>
           </div>
@@ -89,7 +89,7 @@ export const Dashboard: React.FC = () => {
                       <span style={{ fontSize: '0.85rem' }}>{m.model_used}</span>
                       <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                         <span><strong>{m.count}</strong> runs</span>
-                        <span>${(m.total_cost || 0).toFixed(4)}</span>
+                        <span>${Number(m.total_cost || 0).toFixed(4)}</span>
                       </div>
                     </div>
                   ))}

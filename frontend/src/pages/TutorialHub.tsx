@@ -280,7 +280,7 @@ export const TutorialHub: React.FC = () => {
                         <div className="meta-item">Model: <strong>{executionResult.model}</strong></div>
                         <div className="meta-item">Latency: <strong>{executionResult.latency_ms}ms</strong></div>
                         <div className="meta-item">Tokens: <strong>{executionResult.tokens_input + executionResult.tokens_output}</strong></div>
-                        <div className="meta-item">Cost: <strong>${executionResult.cost_estimate.toFixed(4)}</strong></div>
+                        <div className="meta-item">Cost: <strong>${Number(executionResult.cost_estimate).toFixed(4)}</strong></div>
                       </div>
                     </div>
                   )}
