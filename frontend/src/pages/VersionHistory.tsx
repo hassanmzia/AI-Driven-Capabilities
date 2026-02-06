@@ -23,8 +23,8 @@ export function VersionHistory() {
     try {
       const data = await getExecutions();
       setExecutions(data.results || []);
-    } catch (err) {
-      setError('Failed to load execution history.');
+    } catch (err: any) {
+      setError(err?.response?.data?.error || err?.message || 'Failed to load execution history.');
     } finally {
       setLoading(false);
     }
@@ -78,34 +78,15 @@ export function VersionHistory() {
     return date.toLocaleString();
   };
 
-  const formatCost = (cost: number | undefined): string => {
+  const formatCost = (cost: number | null | undefined): string => {
     if (cost === undefined || cost === null) return 'N/A';
     return `$${cost.toFixed(4)}`;
   };
 
-  const formatTokens = (tokens: number | undefined): string => {
-    if (tokens === undefined || tokens === null) return 'N/A';
+  const formatTokens = (tokens: number | null | undefined): string => {
+    if (tokens === undefined || tokens === null || isNaN(tokens)) return 'N/A';
     return tokens.toLocaleString();
   };
-
-  if (loading) {
-    return (
-      <div className="loading-spinner" style={{ color: 'var(--text-secondary)' }}>
-        Loading version history...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-box" style={{ color: 'var(--text-primary)' }}>
-        <p>{error}</p>
-        <button className="btn btn-primary" onClick={loadExecutions}>
-          Retry
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div style={{ padding: '1rem', color: 'var(--text-primary)' }}>
@@ -118,166 +99,193 @@ export function VersionHistory() {
         </p>
       </div>
 
-      <div
-        className="card"
-        style={{
-          marginBottom: '1.5rem',
-          padding: '1rem',
-          backgroundColor: 'var(--bg-card)',
-        }}
-      >
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div className="form-group" style={{ flex: 1, minWidth: '200px' }}>
-            <label className="form-label" style={{ color: 'var(--text-secondary)' }}>
-              Filter by Category
-            </label>
-            <select
-              className="form-input"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}
-            >
-              <option value="all">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group" style={{ flex: 2, minWidth: '250px' }}>
-            <label className="form-label" style={{ color: 'var(--text-secondary)' }}>
-              Search
-            </label>
-            <input
-              className="form-input"
-              type="text"
-              placeholder="Search by category, model, or ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}
-            />
-          </div>
+      {error && (
+        <div className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem', border: '1px solid rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.08)' }}>
+          <p style={{ color: '#ef4444', marginBottom: '0.75rem' }}>{error}</p>
+          <button className="btn btn-primary" onClick={loadExecutions}>
+            Retry
+          </button>
         </div>
-        <div className="meta-row" style={{ marginTop: '0.75rem' }}>
-          <span className="meta-item" style={{ color: 'var(--text-secondary)' }}>
-            Showing {filteredExecutions.length} of {executions.length} executions
-          </span>
-          <span className="meta-item" style={{ color: 'var(--text-secondary)' }}>
-            {Object.keys(groupedExecutions).length} categories
-          </span>
-        </div>
-      </div>
+      )}
 
-      {Object.keys(groupedExecutions).length === 0 ? (
-        <div className="empty-state" style={{ color: 'var(--text-secondary)' }}>
-          No executions found matching your filters.
+      {loading && (
+        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <div className="loading-spinner" />
+          <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>
+            Loading execution history...
+          </p>
         </div>
-      ) : (
-        Object.entries(groupedExecutions).map(([category, items]) => (
-          <div key={category} style={{ marginBottom: '2rem' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                marginBottom: '1rem',
-              }}
-            >
-              <h2 style={{ color: 'var(--text-primary)', margin: 0 }}>{category}</h2>
-              <span className="badge badge-success">{items.length} versions</span>
+      )}
+
+      {!loading && !error && (
+        <>
+          <div
+            className="card"
+            style={{
+              marginBottom: '1.5rem',
+              padding: '1rem',
+              backgroundColor: 'var(--bg-card)',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <div className="form-group" style={{ flex: 1, minWidth: '200px' }}>
+                <label className="form-label" style={{ color: 'var(--text-secondary)' }}>
+                  Filter by Category
+                </label>
+                <select
+                  className="form-select"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  <option value="all">All Categories</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group" style={{ flex: 2, minWidth: '250px' }}>
+                <label className="form-label" style={{ color: 'var(--text-secondary)' }}>
+                  Search
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="Search by category, model, or ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
+            <div className="meta-row" style={{ marginTop: '0.75rem' }}>
+              <span className="meta-item" style={{ color: 'var(--text-secondary)' }}>
+                Showing {filteredExecutions.length} of {executions.length} executions
+              </span>
+              <span className="meta-item" style={{ color: 'var(--text-secondary)' }}>
+                {Object.keys(groupedExecutions).length} categories
+              </span>
+            </div>
+          </div>
 
-            <div
-              style={{
-                borderLeft: '2px solid var(--accent)',
-                paddingLeft: '1.5rem',
-                marginLeft: '0.5rem',
-              }}
-            >
-              {items.map((execution, index) => (
+          {Object.keys(groupedExecutions).length === 0 ? (
+            <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                No executions found
+              </p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                {executions.length === 0
+                  ? 'Run some prompts first, then come back to see your execution history here.'
+                  : 'No executions match your current filters. Try adjusting the category or search term.'}
+              </p>
+            </div>
+          ) : (
+            Object.entries(groupedExecutions).map(([category, items]) => (
+              <div key={category} style={{ marginBottom: '2rem' }}>
                 <div
-                  key={execution.id || index}
-                  className="card"
                   style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
                     marginBottom: '1rem',
-                    padding: '1rem',
-                    backgroundColor: 'var(--bg-card)',
-                    position: 'relative',
                   }}
                 >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: '-2.05rem',
-                      top: '1.25rem',
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--accent)',
-                    }}
-                  />
-                  <div className="card-header" style={{ marginBottom: '0.5rem' }}>
-                    <span
-                      className="card-title"
-                      style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}
-                    >
-                      {execution.id || `Execution ${index + 1}`}
-                    </span>
-                    <span
-                      className="badge badge-warning"
-                      style={{ fontSize: '0.75rem' }}
-                    >
-                      v{items.length - index}
-                    </span>
-                  </div>
-                  <div className="meta-row" style={{ flexWrap: 'wrap', gap: '1rem' }}>
-                    <div className="meta-item">
-                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                        Category
-                      </span>
-                      <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
-                        {execution.category || 'N/A'}
-                      </span>
-                    </div>
-                    <div className="meta-item">
-                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                        Timestamp
-                      </span>
-                      <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
-                        {formatTimestamp(execution.created_at)}
-                      </span>
-                    </div>
-                    <div className="meta-item">
-                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                        Model
-                      </span>
-                      <span style={{ color: 'var(--accent)', fontSize: '0.85rem' }}>
-                        {execution.model_used || 'N/A'}
-                      </span>
-                    </div>
-                    <div className="meta-item">
-                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                        Tokens
-                      </span>
-                      <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
-                        {formatTokens(execution.tokens_input + execution.tokens_output)}
-                      </span>
-                    </div>
-                    <div className="meta-item">
-                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                        Cost
-                      </span>
-                      <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
-                        {formatCost(execution.cost_estimate)}
-                      </span>
-                    </div>
-                  </div>
+                  <h2 style={{ color: 'var(--text-primary)', margin: 0 }}>{category}</h2>
+                  <span className="badge badge-success">{items.length} versions</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        ))
+
+                <div
+                  style={{
+                    borderLeft: '2px solid var(--accent)',
+                    paddingLeft: '1.5rem',
+                    marginLeft: '0.5rem',
+                  }}
+                >
+                  {items.map((execution, index) => (
+                    <div
+                      key={execution.id || index}
+                      className="card"
+                      style={{
+                        marginBottom: '1rem',
+                        padding: '1rem',
+                        backgroundColor: 'var(--bg-card)',
+                        position: 'relative',
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: '-2.05rem',
+                          top: '1.25rem',
+                          width: '10px',
+                          height: '10px',
+                          borderRadius: '50%',
+                          backgroundColor: 'var(--accent)',
+                        }}
+                      />
+                      <div className="card-header" style={{ marginBottom: '0.5rem' }}>
+                        <span
+                          className="card-title"
+                          style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}
+                        >
+                          {execution.template_name || execution.category || `Execution ${index + 1}`}
+                        </span>
+                        <span
+                          className="badge badge-warning"
+                          style={{ fontSize: '0.75rem' }}
+                        >
+                          v{items.length - index}
+                        </span>
+                      </div>
+                      <div className="meta-row" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+                        <div className="meta-item">
+                          <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                            Timestamp
+                          </span>
+                          <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
+                            {formatTimestamp(execution.created_at)}
+                          </span>
+                        </div>
+                        <div className="meta-item">
+                          <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                            Model
+                          </span>
+                          <span style={{ color: 'var(--accent)', fontSize: '0.85rem' }}>
+                            {execution.model_used || 'N/A'}
+                          </span>
+                        </div>
+                        <div className="meta-item">
+                          <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                            Tokens
+                          </span>
+                          <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
+                            {formatTokens((execution.tokens_input || 0) + (execution.tokens_output || 0))}
+                          </span>
+                        </div>
+                        <div className="meta-item">
+                          <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                            Cost
+                          </span>
+                          <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
+                            {formatCost(execution.cost_estimate)}
+                          </span>
+                        </div>
+                        <div className="meta-item">
+                          <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                            Latency
+                          </span>
+                          <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
+                            {execution.latency_ms ? `${execution.latency_ms}ms` : 'N/A'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </>
       )}
     </div>
   );
