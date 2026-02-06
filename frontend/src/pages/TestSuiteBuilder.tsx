@@ -116,14 +116,6 @@ export function TestSuiteBuilder() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="loading-spinner" style={{ color: 'var(--text-secondary)' }}>
-        Loading test suites...
-      </div>
-    );
-  }
-
   return (
     <div style={{ padding: '1rem', color: 'var(--text-primary)' }}>
       <div className="page-header">
@@ -136,14 +128,24 @@ export function TestSuiteBuilder() {
       </div>
 
       {error && (
-        <div className="error-box" style={{ marginBottom: '1rem' }}>
-          <p>{error}</p>
+        <div className="card" style={{ marginBottom: '1rem', padding: '1.5rem', border: '1px solid rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.08)' }}>
+          <p style={{ color: '#ef4444', marginBottom: '0.75rem' }}>{error}</p>
           <button className="btn btn-sm btn-secondary" onClick={() => setError(null)}>
             Dismiss
           </button>
         </div>
       )}
 
+      {loading && (
+        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <div className="loading-spinner" />
+          <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>
+            Loading test suites...
+          </p>
+        </div>
+      )}
+
+      {!loading && (
       <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '1.5rem' }}>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -358,6 +360,7 @@ export function TestSuiteBuilder() {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }

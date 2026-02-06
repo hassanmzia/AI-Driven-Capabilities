@@ -76,25 +76,6 @@ export function FavoritesManager() {
     });
   };
 
-  if (loading) {
-    return (
-      <div className="loading-spinner" style={{ color: 'var(--text-secondary)' }}>
-        Loading favorites...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-box" style={{ color: 'var(--text-primary)' }}>
-        <p>{error}</p>
-        <button className="btn btn-primary" onClick={loadData}>
-          Retry
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div style={{ padding: '1rem', color: 'var(--text-primary)' }}>
       <div className="page-header">
@@ -107,16 +88,38 @@ export function FavoritesManager() {
               Organize and manage your favorited prompts across collections
             </p>
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowCreateForm(!showCreateForm)}
-          >
-            {showCreateForm ? 'Cancel' : 'Create Collection'}
-          </button>
+          {!loading && (
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowCreateForm(!showCreateForm)}
+            >
+              {showCreateForm ? 'Cancel' : 'Create Collection'}
+            </button>
+          )}
         </div>
       </div>
 
-      {showCreateForm && (
+      {error && (
+        <div className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem', border: '1px solid rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.08)' }}>
+          <p style={{ color: '#ef4444', marginBottom: '0.75rem' }}>{error}</p>
+          <button className="btn btn-primary" onClick={loadData}>
+            Retry
+          </button>
+        </div>
+      )}
+
+      {loading && (
+        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <div className="loading-spinner" />
+          <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>
+            Loading favorites...
+          </p>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <>
+          {showCreateForm && (
         <div
           className="card"
           style={{ padding: '1rem', marginBottom: '1.5rem', backgroundColor: 'var(--bg-card)' }}
@@ -204,13 +207,15 @@ export function FavoritesManager() {
         })}
       </div>
 
-      {filteredFavorites.length === 0 ? (
-        <div className="empty-state" style={{ color: 'var(--text-secondary)' }}>
-          {activeTab === 'all'
-            ? 'No favorites yet. Start favoriting prompts to see them here.'
-            : 'No favorites in this collection.'}
-        </div>
-      ) : (
+          {filteredFavorites.length === 0 ? (
+            <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+              <p style={{ color: 'var(--text-secondary)' }}>
+                {activeTab === 'all'
+                  ? 'No favorites yet. Start favoriting prompts to see them here.'
+                  : 'No favorites in this collection.'}
+              </p>
+            </div>
+          ) : (
         <div
           style={{
             display: 'grid',
@@ -286,6 +291,8 @@ export function FavoritesManager() {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
     </div>
   );
