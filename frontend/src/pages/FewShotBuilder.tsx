@@ -451,7 +451,7 @@ export const FewShotBuilder: React.FC = () => {
                     Tokens Out: <strong>{result.tokens_output}</strong>
                   </div>
                   <div className="meta-item">
-                    Cost: <strong>${result.cost_estimate.toFixed(5)}</strong>
+                    Cost: <strong>${Number(result.cost_estimate).toFixed(5)}</strong>
                   </div>
                   <div className="meta-item">
                     Latency: <strong>{result.latency_ms}ms</strong>
@@ -483,7 +483,7 @@ export const FewShotBuilder: React.FC = () => {
                   Tokens Out: <strong>{result.tokens_output}</strong>
                 </div>
                 <div className="meta-item">
-                  Cost: <strong>${result.cost_estimate.toFixed(5)}</strong>
+                  Cost: <strong>${Number(result.cost_estimate).toFixed(5)}</strong>
                 </div>
                 <div className="meta-item">
                   Latency: <strong>{result.latency_ms}ms</strong>

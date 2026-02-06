@@ -100,7 +100,7 @@ export const Localizer: React.FC = () => {
       <div className="meta-item">Model: <strong>{r.model}</strong></div>
       <div className="meta-item">Tokens In: <strong>{r.tokens_input}</strong></div>
       <div className="meta-item">Tokens Out: <strong>{r.tokens_output}</strong></div>
-      <div className="meta-item">Cost: <strong>${r.cost_estimate.toFixed(5)}</strong></div>
+      <div className="meta-item">Cost: <strong>${Number(r.cost_estimate).toFixed(5)}</strong></div>
       <div className="meta-item">Latency: <strong>{r.latency_ms}ms</strong></div>
       <div className="meta-item">
         <span className="badge badge-accent" style={{ fontSize: '0.68rem' }}>{r.execution_id}</span>

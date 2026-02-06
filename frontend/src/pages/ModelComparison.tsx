@@ -286,7 +286,7 @@ export const ModelComparison: React.FC = () => {
                           color: isCheapest ? 'var(--success, #22c55e)' : 'var(--text-primary)',
                         }}
                       >
-                        ${mr.cost_estimate.toFixed(5)}
+                        ${Number(mr.cost_estimate).toFixed(5)}
                       </strong>
                     </div>
                     <div className="meta-item">
@@ -319,7 +319,7 @@ export const ModelComparison: React.FC = () => {
                   Total Tokens: <strong>{rawResult.tokens_input + rawResult.tokens_output}</strong>
                 </div>
                 <div className="meta-item">
-                  Total Cost: <strong>${rawResult.cost_estimate.toFixed(5)}</strong>
+                  Total Cost: <strong>${Number(rawResult.cost_estimate).toFixed(5)}</strong>
                 </div>
                 <div className="meta-item">
                   Latency: <strong>{rawResult.latency_ms}ms</strong>

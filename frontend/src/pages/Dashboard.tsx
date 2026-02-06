@@ -47,7 +47,7 @@ export const Dashboard: React.FC = () => {
               <div className="stat-label">Total Tokens</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">${(stats?.total_cost ?? 0).toFixed(4)}</div>
+              <div className="stat-value">${Number(stats?.total_cost ?? 0).toFixed(4)}</div>
               <div className="stat-label">Total Cost</div>
             </div>
             <div className="stat-card">
@@ -89,7 +89,7 @@ export const Dashboard: React.FC = () => {
                       <span style={{ fontSize: '0.85rem' }}>{m.model_used}</span>
                       <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                         <span><strong>{m.count}</strong> runs</span>
-                        <span>${(m.total_cost || 0).toFixed(4)}</span>
+                        <span>${Number(m.total_cost || 0).toFixed(4)}</span>
                       </div>
                     </div>
                   ))}

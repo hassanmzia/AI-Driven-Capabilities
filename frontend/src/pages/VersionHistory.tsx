@@ -79,14 +79,16 @@ export function VersionHistory() {
     return date.toLocaleString();
   };
 
-  const formatCost = (cost: number | null | undefined): string => {
+  const formatCost = (cost: number | string | null | undefined): string => {
     if (cost === undefined || cost === null) return 'N/A';
-    return `$${cost.toFixed(4)}`;
+    return `$${Number(cost).toFixed(4)}`;
   };
 
-  const formatTokens = (tokens: number | null | undefined): string => {
-    if (tokens === undefined || tokens === null || isNaN(tokens)) return 'N/A';
-    return tokens.toLocaleString();
+  const formatTokens = (tokens: number | string | null | undefined): string => {
+    if (tokens === undefined || tokens === null) return 'N/A';
+    const n = Number(tokens);
+    if (isNaN(n)) return 'N/A';
+    return n.toLocaleString();
   };
 
   return (
