@@ -3,6 +3,15 @@ import { getMCPTools, getMCPInfo, executeMCPTool, getAgentCards } from '../servi
 import type { MCPTool, AgentCard } from '../types';
 import { FormattedOutput } from '../components/shared/FormattedOutput';
 
+interface SchemaProperty {
+  type: string;
+  description?: string;
+  default?: any;
+  enum?: string[];
+  minimum?: number;
+  maximum?: number;
+}
+
 export const MCPExplorer: React.FC = () => {
   const [tab, setTab] = useState<'tools' | 'agents' | 'execute'>('tools');
   const [tools, setTools] = useState<MCPTool[]>([]);
@@ -12,7 +21,7 @@ export const MCPExplorer: React.FC = () => {
 
   // Execute state
   const [selectedTool, setSelectedTool] = useState('');
-  const [toolArgs, setToolArgs] = useState('{}');
+  const [formArgs, setFormArgs] = useState<Record<string, any>>({});
   const [execResult, setExecResult] = useState<string | null>(null);
   const [execLoading, setExecLoading] = useState(false);
   const [execError, setExecError] = useState<string | null>(null);
@@ -29,11 +38,35 @@ export const MCPExplorer: React.FC = () => {
     }).finally(() => setLoading(false));
   }, []);
 
+  const currentTool = tools.find((t) => t.name === selectedTool);
+  const schema = currentTool?.inputSchema as { properties?: Record<string, SchemaProperty>; required?: string[] } | undefined;
+  const properties = schema?.properties || {};
+  const required = schema?.required || [];
+
+  const handleToolChange = (toolName: string) => {
+    setSelectedTool(toolName);
+    const tool = tools.find((t) => t.name === toolName);
+    const props = (tool?.inputSchema as any)?.properties || {};
+    const defaults: Record<string, any> = {};
+    Object.entries(props).forEach(([key, prop]: [string, any]) => {
+      if (prop.default !== undefined) defaults[key] = prop.default;
+      else defaults[key] = '';
+    });
+    setFormArgs(defaults);
+  };
+
+  const updateArg = (key: string, value: any) => {
+    setFormArgs((prev) => ({ ...prev, [key]: value }));
+  };
+
   const handleExecuteTool = async () => {
     if (!selectedTool) return;
     setExecLoading(true); setExecError(null); setExecResult(null);
     try {
-      const args = JSON.parse(toolArgs);
+      const args: Record<string, any> = {};
+      Object.entries(formArgs).forEach(([key, value]) => {
+        if (value !== '' && value !== undefined) args[key] = value;
+      });
       const result = await executeMCPTool(selectedTool, args);
       setExecResult(JSON.stringify(result, null, 2));
     } catch (e: any) {
@@ -42,6 +75,79 @@ export const MCPExplorer: React.FC = () => {
       setExecLoading(false);
     }
   };
+
+  const formatLabel = (key: string): string =>
+    key.replace(/[_-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const renderField = (key: string, prop: SchemaProperty) => {
+    const isRequired = required.includes(key);
+    const label = `${formatLabel(key)}${isRequired ? ' *' : ''}`;
+    const value = formArgs[key] ?? prop.default ?? '';
+
+    if (prop.enum) {
+      return (
+        <div className="form-group" key={key}>
+          <label className="form-label">{label}</label>
+          <select className="form-select" value={value} onChange={(e) => updateArg(key, e.target.value)}>
+            {prop.enum.map((opt) => <option key={opt} value={opt}>{formatLabel(opt)}</option>)}
+          </select>
+          {prop.description && <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{prop.description}</div>}
+        </div>
+      );
+    }
+
+    if (prop.type === 'number' || prop.type === 'integer') {
+      return (
+        <div className="form-group" key={key}>
+          <label className="form-label">{label}</label>
+          <input
+            type="number"
+            className="form-input"
+            value={value}
+            min={prop.minimum}
+            max={prop.maximum}
+            step={prop.type === 'number' ? 0.1 : 1}
+            onChange={(e) => updateArg(key, e.target.value === '' ? '' : Number(e.target.value))}
+          />
+          {prop.description && <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{prop.description}</div>}
+        </div>
+      );
+    }
+
+    const isLongText = isRequired || ['text', 'content', 'transcript', 'complaint', 'prompt', 'review'].some((k) => key.toLowerCase().includes(k));
+    if (isLongText) {
+      return (
+        <div className="form-group" key={key}>
+          <label className="form-label">{label}</label>
+          <textarea
+            className="form-textarea"
+            placeholder={prop.description || ''}
+            value={value}
+            onChange={(e) => updateArg(key, e.target.value)}
+            style={{ minHeight: '100px' }}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="form-group" key={key}>
+        <label className="form-label">{label}</label>
+        <input
+          type="text"
+          className="form-input"
+          placeholder={prop.description || ''}
+          value={value}
+          onChange={(e) => updateArg(key, e.target.value)}
+        />
+      </div>
+    );
+  };
+
+  const canExecute = selectedTool && required.every((key) => {
+    const val = formArgs[key];
+    return val !== undefined && val !== '';
+  });
 
   return (
     <div>
@@ -66,14 +172,14 @@ export const MCPExplorer: React.FC = () => {
                 <div className="card" style={{ marginBottom: '1.5rem', borderColor: 'var(--accent)' }}>
                   <div className="card-title">MCP Server Info</div>
                   <div className="output-box" style={{ marginTop: '0.5rem', maxHeight: '150px' }}>
-                    {JSON.stringify(serverInfo, null, 2)}
+                    <FormattedOutput text={JSON.stringify(serverInfo, null, 2)} />
                   </div>
                 </div>
               )}
 
               <div className="template-grid">
                 {tools.map((tool) => (
-                  <div key={tool.name} className="template-card" onClick={() => { setSelectedTool(tool.name); setTab('execute'); }}>
+                  <div key={tool.name} className="template-card" onClick={() => { handleToolChange(tool.name); setTab('execute'); }}>
                     <h3 style={{ fontFamily: 'monospace', color: 'var(--accent)' }}>{tool.name}</h3>
                     <p>{tool.description}</p>
                     <details style={{ marginTop: '0.5rem' }}>
@@ -129,21 +235,13 @@ export const MCPExplorer: React.FC = () => {
                 <div className="card-title" style={{ marginBottom: '1rem' }}>Execute MCP Tool</div>
                 <div className="form-group">
                   <label className="form-label">Tool Name</label>
-                  <select className="form-select" value={selectedTool} onChange={(e) => setSelectedTool(e.target.value)}>
+                  <select className="form-select" value={selectedTool} onChange={(e) => handleToolChange(e.target.value)}>
                     <option value="">Select a tool...</option>
                     {tools.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Arguments (JSON)</label>
-                  <textarea
-                    className="form-textarea"
-                    value={toolArgs}
-                    onChange={(e) => setToolArgs(e.target.value)}
-                    style={{ minHeight: '200px', fontFamily: 'monospace', fontSize: '0.8rem' }}
-                  />
-                </div>
-                <button className="btn btn-primary" onClick={handleExecuteTool} disabled={execLoading || !selectedTool}>
+                {selectedTool && Object.entries(properties).map(([key, prop]) => renderField(key, prop as SchemaProperty))}
+                <button className="btn btn-primary" onClick={handleExecuteTool} disabled={execLoading || !canExecute} style={{ width: '100%', marginTop: '0.5rem' }}>
                   {execLoading ? <><span className="loading-spinner" /> Executing...</> : 'Execute via MCP'}
                 </button>
               </div>

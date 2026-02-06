@@ -204,26 +204,83 @@ function TextOutput({ text }: { text: string }): React.ReactElement {
   return <div>{elements}</div>;
 }
 
-function tryParseJSON(text: string): any | null {
-  const trimmed = text.trim();
-  if ((!trimmed.startsWith('{') && !trimmed.startsWith('[')) || (!trimmed.endsWith('}') && !trimmed.endsWith(']'))) {
-    return null;
-  }
+function sanitizeJSON(str: string): string {
+  // Fix unquoted NULL, TRUE, FALSE that LLMs often produce
+  return str
+    .replace(/:\s*NULL\b/gi, ': null')
+    .replace(/:\s*TRUE\b/gi, ': true')
+    .replace(/:\s*FALSE\b/gi, ': false')
+    .replace(/,\s*([}\]])/g, '$1'); // remove trailing commas
+}
+
+function tryParse(str: string): any | null {
   try {
-    return JSON.parse(trimmed);
+    return JSON.parse(str);
   } catch {
-    return null;
+    try {
+      return JSON.parse(sanitizeJSON(str));
+    } catch {
+      return null;
+    }
   }
 }
 
+function extractJSON(text: string): { parsed: any; before: string; after: string } | null {
+  const trimmed = text.trim();
+
+  // Direct JSON
+  if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+      (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+    const parsed = tryParse(trimmed);
+    if (parsed !== null) return { parsed, before: '', after: '' };
+  }
+
+  // JSON inside markdown code blocks: ```json\n...\n``` or ```\n...\n```
+  const codeBlockRegex = /```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/;
+  const cbMatch = trimmed.match(codeBlockRegex);
+  if (cbMatch) {
+    const parsed = tryParse(cbMatch[1].trim());
+    if (parsed !== null) {
+      const idx = trimmed.indexOf(cbMatch[0]);
+      const before = trimmed.slice(0, idx).trim();
+      const after = trimmed.slice(idx + cbMatch[0].length).trim();
+      return { parsed, before, after };
+    }
+  }
+
+  // JSON embedded in text — find first { or [ and match to last } or ]
+  const firstBrace = trimmed.search(/[{[]/);
+  if (firstBrace >= 0) {
+    const opener = trimmed[firstBrace];
+    const closer = opener === '{' ? '}' : ']';
+    const lastClose = trimmed.lastIndexOf(closer);
+    if (lastClose > firstBrace) {
+      const candidate = trimmed.slice(firstBrace, lastClose + 1);
+      const parsed = tryParse(candidate);
+      if (parsed !== null) {
+        const before = trimmed.slice(0, firstBrace).trim();
+        const after = trimmed.slice(lastClose + 1).trim();
+        return { parsed, before, after };
+      }
+    }
+  }
+
+  return null;
+}
+
 export const FormattedOutput: React.FC<{ text: string }> = ({ text }) => {
-  const parsed = tryParseJSON(text);
-  if (parsed && typeof parsed === 'object') {
+  const extracted = extractJSON(text);
+  if (extracted && typeof extracted.parsed === 'object') {
     return (
       <div style={{ padding: '0.25rem 0' }}>
-        {Array.isArray(parsed) ? (
+        {extracted.before && (
+          <div style={{ marginBottom: '0.75rem' }}>
+            <TextOutput text={extracted.before} />
+          </div>
+        )}
+        {Array.isArray(extracted.parsed) ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {parsed.map((item, i) => (
+            {extracted.parsed.map((item, i) => (
               <div key={i} style={{ padding: '0.75rem', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '0.5rem', borderLeft: '3px solid var(--accent)' }}>
                 {typeof item === 'object' && item !== null ? (
                   <JsonSection data={item} />
@@ -234,7 +291,12 @@ export const FormattedOutput: React.FC<{ text: string }> = ({ text }) => {
             ))}
           </div>
         ) : (
-          <JsonSection data={parsed} />
+          <JsonSection data={extracted.parsed} />
+        )}
+        {extracted.after && (
+          <div style={{ marginTop: '0.75rem' }}>
+            <TextOutput text={extracted.after} />
+          </div>
         )}
       </div>
     );
