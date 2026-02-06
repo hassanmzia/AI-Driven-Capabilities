@@ -23,6 +23,7 @@ export const MCPExplorer: React.FC = () => {
   const [selectedTool, setSelectedTool] = useState('');
   const [formArgs, setFormArgs] = useState<Record<string, any>>({});
   const [execResult, setExecResult] = useState<string | null>(null);
+  const [execMeta, setExecMeta] = useState<Record<string, any> | null>(null);
   const [execLoading, setExecLoading] = useState(false);
   const [execError, setExecError] = useState<string | null>(null);
 
@@ -61,14 +62,17 @@ export const MCPExplorer: React.FC = () => {
 
   const handleExecuteTool = async () => {
     if (!selectedTool) return;
-    setExecLoading(true); setExecError(null); setExecResult(null);
+    setExecLoading(true); setExecError(null); setExecResult(null); setExecMeta(null);
     try {
       const args: Record<string, any> = {};
       Object.entries(formArgs).forEach(([key, value]) => {
         if (value !== '' && value !== undefined) args[key] = value;
       });
       const result = await executeMCPTool(selectedTool, args);
-      setExecResult(JSON.stringify(result, null, 2));
+      // Extract LLM output text from MCP response wrapper
+      const outputText = result?.content?.[0]?.text || result?.output || JSON.stringify(result, null, 2);
+      setExecResult(outputText);
+      if (result?.metadata) setExecMeta(result.metadata);
     } catch (e: any) {
       setExecError(e.message || 'Execution failed');
     } finally {
@@ -249,7 +253,30 @@ export const MCPExplorer: React.FC = () => {
               <div className="card">
                 <div className="card-title" style={{ marginBottom: '1rem' }}>Result</div>
                 {execError && <div className="error-box">{execError}</div>}
-                {execResult && <div className="output-box"><FormattedOutput text={execResult} /></div>}
+                {execResult && (
+                  <>
+                    <div className="output-box"><FormattedOutput text={execResult} /></div>
+                    {execMeta && (
+                      <div className="meta-row" style={{ marginTop: '0.75rem' }}>
+                        {execMeta.execution_id && (
+                          <div className="meta-item">ID: <strong style={{ fontSize: '0.7rem' }}>{execMeta.execution_id}</strong></div>
+                        )}
+                        {execMeta.tokens_input != null && (
+                          <div className="meta-item">Tokens In: <strong>{execMeta.tokens_input}</strong></div>
+                        )}
+                        {execMeta.tokens_output != null && (
+                          <div className="meta-item">Tokens Out: <strong>{execMeta.tokens_output}</strong></div>
+                        )}
+                        {execMeta.cost_estimate != null && (
+                          <div className="meta-item">Cost: <strong>${Number(execMeta.cost_estimate).toFixed(5)}</strong></div>
+                        )}
+                        {execMeta.latency_ms != null && (
+                          <div className="meta-item">Latency: <strong>{execMeta.latency_ms}ms</strong></div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
                 {!execResult && !execError && (
                   <div className="empty-state">
                     <p>Select a tool and provide arguments to execute</p>
