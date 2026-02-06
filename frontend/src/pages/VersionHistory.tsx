@@ -22,7 +22,8 @@ export function VersionHistory() {
     setError(null);
     try {
       const data = await getExecutions();
-      setExecutions(data.results || []);
+      const results = data && data.results ? data.results : [];
+      setExecutions(results);
     } catch (err: any) {
       setError(err?.response?.data?.error || err?.message || 'Failed to load execution history.');
     } finally {

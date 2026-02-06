@@ -1,6 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, Component, ErrorInfo, ReactNode } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import { Dashboard } from './pages/Dashboard';
+
+// Error boundary to catch runtime crashes and show useful error info
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: string }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: '' };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error: error.message };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('Page crash:', error, info.componentStack);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '2rem', color: '#ef4444' }}>
+          <h2>Something went wrong</h2>
+          <pre style={{ whiteSpace: 'pre-wrap', color: '#ccc', background: '#1a1a2e', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
+            {this.state.error}
+          </pre>
+          <button
+            style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#6366f1', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+            onClick={() => this.setState({ hasError: false, error: '' })}
+          >
+            Try Again
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 import { FeedbackAnalysis } from './pages/FeedbackAnalysis';
 import { MeetingSummarizer } from './pages/MeetingSummarizer';
 import { QuizGenerator } from './pages/QuizGenerator';
@@ -130,7 +163,9 @@ const App: React.FC = () => {
     <div className="app-container">
       <Sidebar currentPage={currentPage} onNavigate={(page) => setCurrentPage(page as PageKey)} />
       <main className="main-content">
-        {renderPage()}
+        <ErrorBoundary key={currentPage}>
+          {renderPage()}
+        </ErrorBoundary>
       </main>
     </div>
   );
