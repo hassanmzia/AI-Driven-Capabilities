@@ -24,6 +24,9 @@ urlpatterns = [
     path('auth/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('auth/me/', views.me, name='me'),
     path('auth/profile/', views.update_profile, name='update-profile'),
+    path('auth/user-info/', views.update_user_info, name='update-user-info'),
+    path('auth/change-password/', views.change_password, name='change-password'),
+    path('auth/delete-account/', views.delete_account, name='delete-account'),
     # Actions
     path('run-test-suite/', views.run_test_suite_view, name='run-test-suite'),
     path('batch-evaluation/', views.batch_evaluation, name='batch-evaluation'),
