@@ -64,7 +64,7 @@ export const TutorialHub: React.FC = () => {
     };
     load();
     return () => { cancelled = true; };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const completedCount = completedIds.size;
   const totalCount = tutorials.length;
