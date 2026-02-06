@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'promptengine',
     'agents',
     'analytics',
+    'platform.apps.PlatformConfig',
 ]
 
 MIDDLEWARE = [
@@ -105,6 +106,18 @@ REST_FRAMEWORK = {
         'anon': '30/minute',
         'user': '120/minute',
     },
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
+# JWT
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=12),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
 }
 
 # Cache

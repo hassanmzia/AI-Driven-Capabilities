@@ -157,3 +157,154 @@ export interface CompareResult extends ExecutionResult {
   output_a?: string;
   output_b?: string;
 }
+
+// --- Platform Types ---
+
+export interface UserInfo {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  theme: string;
+  onboarding_completed: boolean;
+  avatar_color: string;
+}
+
+export interface PromptProject {
+  id: string;
+  name: string;
+  description: string;
+  is_shared: boolean;
+  tags: string[];
+  prompt_count: number;
+  test_suite_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TestSuite {
+  id: string;
+  name: string;
+  description: string;
+  prompt_text: string;
+  system_prompt: string;
+  model: string;
+  project: string | null;
+  test_cases: TestCase[];
+  run_count: number;
+  created_at: string;
+}
+
+export interface TestCase {
+  id: string;
+  suite: string;
+  name: string;
+  input_text: string;
+  expected_output: string;
+  criteria: string;
+  order: number;
+}
+
+export interface TestRun {
+  id: string;
+  suite: string;
+  prompt_text: string;
+  model: string;
+  total_cases: number;
+  passed_cases: number;
+  avg_score: number;
+  total_tokens: number;
+  total_cost: number;
+  total_latency_ms: number;
+  pass_rate: number;
+  results: TestResultItem[];
+  created_at: string;
+}
+
+export interface TestResultItem {
+  id: string;
+  test_case_name: string;
+  actual_output: string;
+  score: number;
+  passed: boolean;
+  evaluation: string;
+  tokens_used: number;
+  latency_ms: number;
+}
+
+export interface Tutorial {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: string;
+  category: string;
+  content: string;
+  example_prompt: string;
+  example_input: string;
+  sandbox_enabled: boolean;
+  order: number;
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: string;
+  criteria: string;
+  test_input: string;
+  expected_behavior: string;
+  hints: string[];
+  points: number;
+  submission_count: number;
+  best_score: number | null;
+}
+
+export interface ChallengeSubmission {
+  submission_id: string;
+  output: string;
+  evaluation: string;
+  score: number;
+  tokens_input: number;
+  cost_estimate: number;
+  latency_ms: number;
+  model: string;
+}
+
+export interface SharedPrompt {
+  id: string;
+  title: string;
+  description: string;
+  system_prompt: string;
+  user_prompt_template: string;
+  category: string;
+  tags: string[];
+  author_name: string;
+  upvotes: number;
+  downloads: number;
+  created_at: string;
+}
+
+export interface Technique {
+  name: string;
+  category: string;
+  description: string;
+  when_to_use: string;
+  example: string;
+}
+
+export interface PromptCollection {
+  id: string;
+  name: string;
+  description: string;
+  favorite_count: number;
+  created_at: string;
+}
+
+export interface PromptFavorite {
+  id: string;
+  execution: string;
+  collection: string | null;
+  notes: string;
+  created_at: string;
+}

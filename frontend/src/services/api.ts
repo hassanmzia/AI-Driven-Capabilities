@@ -1,5 +1,9 @@
 import axios from 'axios';
-import type { ExecutionResult, CompareResult, DashboardStats, PromptTemplate, PromptExecution, MCPTool, AgentCard } from '../types';
+import type {
+  ExecutionResult, CompareResult, DashboardStats, PromptTemplate, PromptExecution, MCPTool, AgentCard,
+  UserInfo, PromptProject, TestSuite, TestCase, TestRun, Tutorial, Challenge, ChallengeSubmission,
+  SharedPrompt, Technique, PromptCollection, PromptFavorite,
+} from '../types';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://172.168.1.95:4070';
 
@@ -7,6 +11,15 @@ const api = axios.create({
   baseURL: API_BASE,
   timeout: 120000,
   headers: { 'Content-Type': 'application/json' },
+});
+
+// JWT token interceptor
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  const sessionId = localStorage.getItem('session_id');
+  if (sessionId) config.headers['X-Session-Id'] = sessionId;
+  return config;
 });
 
 // --- Prompt Execution APIs ---
@@ -216,3 +229,138 @@ export const runMultiAgentWorkflow = (task: string, category: string, input_data
 
 export const checkGatewayHealth = () =>
   api.get('/health').then(r => r.data);
+
+// ==================================================================
+// Platform APIs (Phases 7-12)
+// ==================================================================
+
+// --- Auth ---
+export const registerUser = (data: { username: string; email: string; password: string; first_name?: string; last_name?: string }) =>
+  api.post('/api/v1/platform/auth/register/', data).then(r => r.data);
+
+export const loginUser = (data: { username: string; password: string }): Promise<{ access: string; refresh: string }> =>
+  api.post('/api/v1/platform/auth/login/', data).then(r => r.data);
+
+export const refreshToken = (refresh: string): Promise<{ access: string }> =>
+  api.post('/api/v1/platform/auth/refresh/', { refresh }).then(r => r.data);
+
+export const getMe = (): Promise<{ user: UserInfo | null }> =>
+  api.get('/api/v1/platform/auth/me/').then(r => r.data);
+
+export const updateProfile = (data: { theme?: string; onboarding_completed?: boolean; avatar_color?: string }) =>
+  api.patch('/api/v1/platform/auth/profile/', data).then(r => r.data);
+
+// --- Projects ---
+export const getProjects = (): Promise<{ results: PromptProject[] }> =>
+  api.get('/api/v1/platform/projects/').then(r => r.data);
+
+export const createProject = (data: { name: string; description?: string; tags?: string[] }): Promise<PromptProject> =>
+  api.post('/api/v1/platform/projects/', data).then(r => r.data);
+
+export const deleteProject = (id: string) =>
+  api.delete(`/api/v1/platform/projects/${id}/`);
+
+// --- Collections & Favorites ---
+export const getCollections = (): Promise<{ results: PromptCollection[] }> =>
+  api.get('/api/v1/platform/collections/').then(r => r.data);
+
+export const createCollection = (data: { name: string; description?: string }): Promise<PromptCollection> =>
+  api.post('/api/v1/platform/collections/', data).then(r => r.data);
+
+export const getFavorites = (): Promise<{ results: PromptFavorite[] }> =>
+  api.get('/api/v1/platform/favorites/').then(r => r.data);
+
+export const addFavorite = (data: { execution: string; collection?: string; notes?: string }): Promise<PromptFavorite> =>
+  api.post('/api/v1/platform/favorites/', data).then(r => r.data);
+
+export const removeFavorite = (id: string) =>
+  api.delete(`/api/v1/platform/favorites/${id}/`);
+
+// --- Test Suites ---
+export const getTestSuites = (): Promise<{ results: TestSuite[] }> =>
+  api.get('/api/v1/platform/test-suites/').then(r => r.data);
+
+export const createTestSuite = (data: Partial<TestSuite>): Promise<TestSuite> =>
+  api.post('/api/v1/platform/test-suites/', data).then(r => r.data);
+
+export const deleteTestSuite = (id: string) =>
+  api.delete(`/api/v1/platform/test-suites/${id}/`);
+
+export const createTestCase = (data: Partial<TestCase>): Promise<TestCase> =>
+  api.post('/api/v1/platform/test-cases/', data).then(r => r.data);
+
+export const deleteTestCase = (id: string) =>
+  api.delete(`/api/v1/platform/test-cases/${id}/`);
+
+export const getTestRuns = (suiteId?: string): Promise<{ results: TestRun[] }> =>
+  api.get('/api/v1/platform/test-runs/', { params: suiteId ? { suite: suiteId } : {} }).then(r => r.data);
+
+export const runTestSuite = (data: { suite_id: string; model?: string; prompt_text?: string }): Promise<TestRun> =>
+  api.post('/api/v1/platform/run-test-suite/', data).then(r => r.data);
+
+// --- Batch & Consistency ---
+export const runBatchEvaluation = (data: {
+  prompt_text: string; system_prompt?: string; inputs: string[]; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/platform/batch-evaluation/', data).then(r => r.data);
+
+export const runConsistencyCheck = (data: {
+  prompt_text: string; system_prompt?: string; input_text: string; num_runs?: number; model?: string;
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/platform/consistency-check/', data).then(r => r.data);
+
+// --- Tutorials ---
+export const getTutorials = (): Promise<{ results: Tutorial[] }> =>
+  api.get('/api/v1/platform/tutorials/').then(r => r.data);
+
+export const completeTutorial = (tutorialId: string, sessionId: string) =>
+  api.post('/api/v1/platform/complete-tutorial/', { tutorial_id: tutorialId, session_id: sessionId }).then(r => r.data);
+
+export const getTutorialProgress = (): Promise<{ progress: Array<{ id: string; title: string; completed: boolean }>; completed_count: number; total_count: number }> =>
+  api.get('/api/v1/platform/tutorial-progress/').then(r => r.data);
+
+// --- Challenges ---
+export const getChallenges = (): Promise<{ results: Challenge[] }> =>
+  api.get('/api/v1/platform/challenges/').then(r => r.data);
+
+export const submitChallenge = (data: { challenge_id: string; prompt_text: string; model?: string }): Promise<ChallengeSubmission> =>
+  api.post('/api/v1/platform/submit-challenge/', data).then(r => r.data);
+
+// --- Techniques ---
+export const getTechniqueLibrary = (): Promise<{ techniques: Technique[] }> =>
+  api.get('/api/v1/platform/technique-library/').then(r => r.data);
+
+// --- Production ---
+export const runCostOptimizer = (data: { prompt_text: string; system_prompt?: string; model?: string }): Promise<ExecutionResult> =>
+  api.post('/api/v1/platform/cost-optimizer/', data).then(r => r.data);
+
+export const runModelComparison = (data: {
+  prompt_text: string; system_prompt?: string; input_text: string; models: string[];
+}): Promise<ExecutionResult> =>
+  api.post('/api/v1/platform/model-comparison/', data).then(r => r.data);
+
+export const generateSnippet = (data: {
+  system_prompt: string; user_prompt_template: string; model?: string; language: string;
+}): Promise<{ snippet: string; language: string }> =>
+  api.post('/api/v1/platform/snippet-generator/', data).then(r => r.data);
+
+// --- Community ---
+export const getCommunityPrompts = (): Promise<{ results: SharedPrompt[] }> =>
+  api.get('/api/v1/platform/community/').then(r => r.data);
+
+export const sharePrompt = (data: Partial<SharedPrompt>): Promise<SharedPrompt> =>
+  api.post('/api/v1/platform/community/', data).then(r => r.data);
+
+export const upvotePrompt = (id: string) =>
+  api.post(`/api/v1/platform/community/${id}/upvote/`).then(r => r.data);
+
+export const downloadSharedPrompt = (id: string): Promise<SharedPrompt> =>
+  api.post(`/api/v1/platform/community/${id}/download/`).then(r => r.data);
+
+// --- Search ---
+export const globalSearch = (query: string, scope?: string) =>
+  api.post('/api/v1/platform/search/', { query, scope: scope || 'all' }).then(r => r.data);
+
+// --- Seed ---
+export const seedPlatformData = () =>
+  api.post('/api/v1/platform/seed-data/').then(r => r.data);

@@ -6,4 +6,5 @@ urlpatterns = [
     path('api/v1/', include('promptengine.urls')),
     path('api/v1/agents/', include('agents.urls')),
     path('api/v1/analytics/', include('analytics.urls')),
+    path('api/v1/platform/', include('platform.urls')),
 ]
