@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: pe_admin
       POSTGRES_PASSWORD: pe_secure_pass_2024
     ports:
-      - "5433:5432"
+      - "5443:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
