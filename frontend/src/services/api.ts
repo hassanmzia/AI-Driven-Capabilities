@@ -5,7 +5,9 @@ import type {
   SharedPrompt, Technique, PromptCollection, PromptFavorite,
 } from '../types';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://172.168.1.95:4070';
+// Use relative URLs so API calls go through the same host/port as the page
+// (nginx reverse proxy routes /api/v1/ to Django, /mcp/ and /a2a/ to gateway)
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 const api = axios.create({
   baseURL: API_BASE,
