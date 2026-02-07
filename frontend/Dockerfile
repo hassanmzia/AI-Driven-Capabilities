@@ -2,8 +2,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-ARG REACT_APP_API_URL=http://172.168.1.95:4070
-ARG REACT_APP_WS_URL=ws://172.168.1.95:4070
+# Empty = relative URLs, so API calls go through the same nginx reverse proxy
+# that serves the page (works with any IP/domain, including NAT setups)
+ARG REACT_APP_API_URL=
+ARG REACT_APP_WS_URL=
 
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 ENV REACT_APP_WS_URL=$REACT_APP_WS_URL
