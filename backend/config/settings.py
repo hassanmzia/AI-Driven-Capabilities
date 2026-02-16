@@ -85,9 +85,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS
 CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
-    'http://172.168.1.95:3070,http://localhost:3070'
+    'https://demo.eminencetechsolutions.com:3080,https://108.48.39.238:3080,http://localhost:3080'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
+
+# HTTPS proxy support - trust X-Forwarded-Proto from nginx
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = [
+    'https://demo.eminencetechsolutions.com:3080',
+    'https://108.48.39.238:3080',
+    'https://172.168.1.95:3080',
+    'https://localhost:3080',
+]
 
 # REST Framework
 REST_FRAMEWORK = {

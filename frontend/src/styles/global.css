@@ -25,12 +25,20 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .app-container {
@@ -579,6 +587,14 @@ body {
     grid-template-columns: 1fr !important;
   }
 
+  .main-content [style*="1fr 1.5fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .main-content [style*="1.5fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
   .main-content [style*="repeat(3"] {
     grid-template-columns: 1fr !important;
   }
@@ -587,7 +603,11 @@ body {
     grid-template-columns: 1fr !important;
   }
 
-  /* Force fixed-width sidebar layouts (e.g. 300px 1fr) to stack on mobile */
+  .main-content [style*="repeat(2"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Force fixed-width sidebar layouts (e.g. 300px 1fr, 320px 1fr) to stack on mobile */
   .main-content [style*="px 1fr"] {
     grid-template-columns: 1fr !important;
   }
@@ -632,6 +652,39 @@ body {
     padding: 0.5rem !important;
     white-space: nowrap;
     font-size: 0.78rem;
+  }
+
+  /* Prevent iOS input zoom (triggers when font-size < 16px) */
+  .form-input,
+  .form-textarea,
+  .form-select,
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Touch-friendly interactive elements */
+  .btn,
+  .nav-item,
+  .tab,
+  button {
+    touch-action: manipulation;
+    min-height: 44px;
+  }
+
+  /* Ensure SVG charts are responsive */
+  .main-content svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Prevent horizontal overflow from pre/code blocks */
+  .main-content pre,
+  .main-content code {
+    max-width: 100%;
+    overflow-x: auto;
+    word-break: break-word;
   }
 
   .sidebar {
