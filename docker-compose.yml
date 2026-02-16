@@ -139,7 +139,7 @@ services:
     image: nginx:alpine
     container_name: pe_nginx
     ports:
-      - "3080:443"
+      - "23080:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./ssl:/etc/nginx/ssl:ro
