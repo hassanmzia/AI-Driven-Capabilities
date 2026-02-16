@@ -23,6 +23,12 @@ frontend/build/
 postgres_data/
 redis_data/
 
+# SSL certificates (keep directory, ignore actual certs)
+ssl/*.pem
+ssl/*.key
+ssl/*.crt
+ssl/*.csr
+
 # OS
 .DS_Store
 Thumbs.db
